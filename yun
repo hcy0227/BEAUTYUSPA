@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title></title>
+<style>
+:root{--bg:#f3f2ed;--paper:#fff;--text:#203b34;--muted:#738078;--line:#dfe6da;--green:#295b49;--soft:#edf4e8;--red:#a05542;--plus:2pt}
+*{box-sizing:border-box}html{touch-action:manipulation;-webkit-text-size-adjust:100%}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:calc(14px + var(--plus));line-height:1.5}button,input,select{font:inherit}button,input,.app,.app *{touch-action:manipulation}button{cursor:pointer;border:0;border-radius:10px;padding:10px 13px;color:var(--text);background:#eaf0e8;font-size:calc(12px + var(--plus))}button:disabled{opacity:.35;cursor:default}button:active:not(:disabled){filter:brightness(.93)}button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid #bfd4b7;outline-offset:2px}input{width:100%;min-width:0;border:1px solid var(--line);background:#fafbf8;color:var(--text);border-radius:9px;padding:9px;font-size:calc(14px + var(--plus))}input:read-only{background:#eaf0e6}input[type=checkbox]{width:23px;height:23px;accent-color:var(--green);flex-shrink:0;margin:0}label{display:block;color:var(--muted);font-size:calc(10px + var(--plus));margin-bottom:5px}h1{font-size:calc(22px + var(--plus));margin:4px 0;font-weight:650;letter-spacing:-.5px}h2{font-size:calc(16px + var(--plus));margin:0 0 14px}h3{font-size:calc(13px + var(--plus));margin:0}small,.note{font-size:calc(10px + var(--plus));color:var(--muted);line-height:1.8}.app{max-width:1320px;margin:auto;padding:20px}.brand{font-size:calc(9px + var(--plus));letter-spacing:2px;color:var(--muted)}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.nav{display:flex;gap:7px;flex-wrap:wrap;margin:17px 0}.nav .active,.primary{background:var(--green);color:white}.page{display:none}.page.active{display:block}.card{background:white;border:1px solid var(--line);padding:18px;border-radius:18px;min-width:0;box-shadow:0 5px 20px #203b3407}.layout{display:grid;grid-template-columns:360px minmax(0,1fr);gap:16px;align-items:start}.layout>*{min-width:0}.tabs{display:flex;gap:4px;background:#f0f3ec;padding:4px;border-radius:10px;margin-bottom:16px}.tabs button{flex:1;padding:9px 3px;background:transparent;font-size:calc(10px + var(--plus))}.tabs button.active{background:white;color:var(--green)}.pane{display:none}.pane.active{display:block}.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.full{grid-column:1/-1}.wide{width:100%;margin-top:15px}.status{margin-top:10px;font-size:calc(10px + var(--plus));line-height:1.7;color:var(--muted)}.error{color:var(--red)!important}.summary{padding:14px;border:1px solid #dce6d5;border-radius:12px;background:#eaf0e6;margin-bottom:14px;font-size:calc(11px + var(--plus));line-height:1.9}.plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-items:start}.plan{background:white;padding:15px;border:1px solid var(--line);border-radius:14px;min-width:0}.plan:nth-child(2){border-color:#87a68a;background:#f7faf3}.price{font-size:calc(25px + var(--plus));font-weight:650;letter-spacing:-.7px;margin:12px 0;overflow-wrap:anywhere}.line{display:flex;justify-content:space-between;gap:8px;font-size:calc(10px + var(--plus));margin:10px 0;align-items:flex-start}.line span{color:var(--muted)}.line b{text-align:right;overflow-wrap:anywhere;font-weight:600}.plan details{border-top:1px solid var(--line);margin-top:14px;padding-top:12px}.plan summary{cursor:pointer;color:var(--green);font-weight:600;font-size:calc(11px + var(--plus));list-style:none;background:#eaf1e4;padding:10px;border-radius:8px}.plan summary::after{content:' ＋'}.plan details[open] summary::after{content:' －'}.plan details h3{margin:16px 0 7px}.plan details .line{padding:7px 0;border-bottom:1px solid #e9eee4}.empty{padding:30px 12px;text-align:center;color:var(--muted);font-size:calc(11px + var(--plus))}.section-gap{margin-top:17px}.product-area{border-top:1px solid var(--line);margin-top:19px;padding-top:16px}.row-head{display:flex;justify-content:space-between;align-items:center;gap:7px;flex-wrap:wrap}.tools{display:flex;gap:6px;flex-wrap:wrap;margin:11px 0}.tools button,.tiny{font-size:calc(10px + var(--plus));padding:7px 9px}.product-list{max-height:370px;overflow:auto;padding-right:3px;overscroll-behavior-y:contain}.product{padding:12px;border:1px solid var(--line);background:#fafbf8;border-radius:12px;margin-bottom:10px}.product.selected{background:#eef5e9;border-color:#87a68a}.order{display:flex;align-items:center;gap:5px;margin-bottom:9px}.order small{margin-right:auto}.product-top{display:flex;align-items:center;gap:7px}.product-top input[type=text]{flex:1}.danger{background:#faebe7;color:var(--red)}.product .fields{margin-top:11px;gap:9px}.product input{padding:8px;font-size:calc(12px + var(--plus))}.totals{background:#e5efdf;border-radius:10px;padding:12px;margin-top:12px}.total-line{display:flex;justify-content:space-between;gap:7px;align-items:center;font-size:calc(11px + var(--plus));padding:5px 0}.total-line b{font-size:calc(16px + var(--plus));overflow-wrap:anywhere}.history-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}.history-head h2{margin:0}.history{max-height:300px;overflow:auto;overscroll-behavior-y:contain}.history-entry{border-bottom:1px solid var(--line);padding:12px 0;font-size:calc(11px + var(--plus))}.history-entry .tools{margin:7px 0}.history-entry p{margin:6px 0;line-height:1.8}.history-entry details{margin-top:8px}.history-entry summary{cursor:pointer;font-size:calc(10px + var(--plus));color:var(--green)}.table-wrap{overflow:auto;margin-top:9px}table{border-collapse:collapse;width:100%;font-size:calc(10px + var(--plus))}th,td{padding:8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}th:first-child,td:first-child{text-align:left}th{background:#f5f7f1;color:var(--muted)}.calcs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.display{border-radius:12px;background:#183d30;color:white;padding:17px;text-align:right;margin:14px 0}.expression{color:#bdd0c4;font-size:calc(11px + var(--plus));min-height:25px;overflow-wrap:anywhere}.answer{font-size:calc(32px + var(--plus));min-height:50px;overflow-wrap:anywhere}.keys{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.keys button{font-size:calc(21px + var(--plus));min-height:54px;background:#f0f2ed}.keys .op{background:#dbe8db}.keys .eq{background:var(--green);color:white}.calc-record{display:flex;align-items:center;justify-content:space-between;gap:9px;border-bottom:1px solid var(--line);padding:10px 0;font-size:calc(11px + var(--plus));overflow-wrap:anywhere}.calc-record span{min-width:0}.calc-record button{flex-shrink:0}.calc-history{max-height:210px;overflow:auto}.footer{margin:17px 0 0}.stale{color:#9a6a2e}
+@media(max-width:1100px){.layout{grid-template-columns:330px minmax(0,1fr)}.plans{grid-template-columns:1fr}.price{margin:8px 0}.plan{padding:14px}}
+@media(min-width:651px) and (max-width:1100px){.layout{grid-template-columns:320px minmax(0,1fr)}}
+@media(max-width:700px){.app{padding:12px}.layout,.calcs{grid-template-columns:1fr}.plans{grid-template-columns:1fr}.card{padding:15px}.nav button{flex:1;font-size:calc(11px + var(--plus))}h1{font-size:calc(20px + var(--plus))}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+
+.layout{display:grid;grid-template-columns:minmax(280px,340px) minmax(0,1fr);gap:18px;align-items:stretch}
+.left-column{display:flex;flex-direction:column;gap:18px;min-width:0;align-self:stretch;height:100%}
+.left-column>.card:first-child{flex:0 0 auto}
+.purchase-card{flex:1 1 auto;display:flex;flex-direction:column;min-height:0}
+.purchase-card .fields{flex:0 0 auto}
+#purchaseResult{margin:auto 0 0;white-space:pre-line;min-height:0}
+.product-area{margin:0;padding:18px;background:white;border:1px solid var(--line);border-radius:18px;align-self:stretch;height:100%;min-height:100%}
+.pricing-results-panel{grid-column:1/-1}
+#productList{max-height:none;overflow:visible;padding:0}
+#addProduct{display:none}
+.category-block{margin:14px 0;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fbfdfa}
+.category-block>.row-head{background:#eaf1e4;padding:8px;border-radius:8px;margin-bottom:10px}
+.product{display:grid;grid-template-columns:24px minmax(0,1.4fr) repeat(3,minmax(0,1fr)) 46px;gap:8px;align-items:end}
+.product-top,.product>.fields{display:contents}
+.product-top>input[type=checkbox]{grid-column:1;grid-row:1;margin-bottom:10px}
+.product-top>input[type=text]{grid-column:2;grid-row:1}
+.product-top>button{grid-column:6;grid-row:1;padding:10px 2px}
+.product>.fields>div:nth-child(1){grid-column:3;grid-row:1}
+.product>.fields>div:nth-child(2){grid-column:4;grid-row:1}
+.product>.fields>div:nth-child(3){grid-column:5;grid-row:1}
+.product input{height:44px;min-width:0}
+.product input[type=checkbox]{height:23px}
+input[type=number]{text-align:right}
+.line,.formula-toggle{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;width:100%;align-items:start}
+.line>b,.formula-toggle>b{text-align:right;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.formula-toggle{background:transparent;border-radius:0;border-bottom:1px solid var(--line);padding:9px 0;margin:6px 0;font-size:calc(10px + var(--plus));text-align:left}
+.formula-toggle>span{color:var(--muted)}
+.formula-toggle>span:after{content:' ▾';color:var(--green)}
+.formula-toggle[aria-expanded=true]>span:after{content:' ▴'}
+.formula-box{white-space:pre-line;background:#edf4e8;border:1px solid #cfd8cc;border-radius:10px;padding:12px;margin:8px 0 12px;line-height:1.9;font-size:calc(10px + var(--plus));overflow-wrap:anywhere}
+[hidden]{display:none!important}
+.history{max-height:none;overflow:visible}
+.history-plan-box{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px;align-items:start}
+@media(max-width:760px){.layout{grid-template-columns:1fr}.left-column{height:auto}.purchase-card{flex:0 0 auto}.product-area{height:auto;min-height:auto}.pricing-results-panel{grid-column:auto}.product{grid-template-columns:24px minmax(0,1fr) minmax(0,1fr)}.product-top>button{grid-column:3;grid-row:1}.product>.fields>div:nth-child(1){grid-column:1/2;grid-row:2}.product>.fields>div:nth-child(2){grid-column:2;grid-row:2}.product>.fields>div:nth-child(3){grid-column:3;grid-row:2}.history-plan-box{gap:6px}.history-plan-box .plan{padding:8px}.history-plan-box .line,.history-plan-box .formula-toggle{grid-template-columns:minmax(0,1fr)}.history-plan-box b{text-align:right}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top"><div><div class="brand">BEAUTY．U．SPA COMPANY</div><h1>美瑀SPA美學｜產品配貨分析</h1><small>產品配貨 · 套組方案 · 雙計算機</small></div><button id="exportAll">匯出全部資料備份</button></header>
+<nav class="nav"><button class="active" data-page="pricing">套組定價與歷史</button><button data-page="calculators">一般計算機 A／B</button></nav>
+<section class="page active" id="pricing">
+<div class="layout">
+<div class="left-column"><section class="card"><h2>方案設定</h2>
+<div class="tabs"><button class="active" data-pane="productSettings">產品</button><button data-pane="operationSettings">營運</button><button data-pane="tierSettings">方案</button></div>
+<div class="pane active" id="productSettings"><div class="fields" id="productFields"></div></div>
+<div class="pane" id="operationSettings"><div class="fields" id="operationFields"></div></div>
+<div class="pane" id="tierSettings"><div class="fields" id="tierFields"></div></div>
+
+<button class="primary wide" id="calculatePrice">開始計算並儲存</button><div class="status" id="priceStatus" role="status">尚未計算。</div>
+</section><section class="card purchase-card" id="purchaseCard"><h2>進貨折數計算（成本）</h2><div class="fields"><div><label for="purchasePrice">產品標示售價</label><input id="purchasePrice" min="0" step="0.01" type="number" value="22800"/></div><div><label for="purchaseDiscount">進貨折數 %（7折填70）</label><input id="purchaseDiscount" max="100" min="0" step="any" type="number" value="70"/></div></div><div class="summary" id="purchaseResult" role="status"></div></section></div><section class="product-area"><div class="row-head"><h3>產品項目</h3><button class="tiny" id="addProduct">＋新增產品</button></div><div class="tools"><button id="selectAll">全部勾選</button><button id="selectNone">取消全選</button><button id="manualMode">改為手動填上方</button></div><div class="product-list" id="productList"></div><div class="totals"><small id="selectedCount">已勾選 0 項</small><div class="total-line"><span>產品價格合計</span><b id="productPriceTotal">$0</b></div><div class="total-line"><span>實際成本合計</span><b id="productCostTotal">$0</b></div></div><div class="status" id="productStatus">
+</div></section>
+<section class="pricing-results-panel"><div class="summary" id="metrics">每個方案含一套產品。無固定薪資；扣除已填成本後，公司與美容師依比例分配。</div><div class="plans" id="plans"><div class="empty">設定完成後按「開始計算並儲存」。</div></div><p class="note">點選方案卡片或「查看方案細項」即可在同頁展開。美容師分潤為每套總分潤池，不是每位美容師的月薪。未填入的稅費、刷卡費、行銷費與退費不在試算內。已包含於每堂成本的耗材，勿重複列為月費用。</p></section>
+</div>
+<section class="card section-gap"><div class="history-head"><h2>定價歷史</h2><div class="tools"><button id="exportHistory">匯出歷史</button><button class="danger" id="clearPrices">清空定價歷史</button></div></div><div class="history" id="priceHistory"></div></section>
+</section>
+<section class="page" id="calculators"><div class="calcs" id="calcs"></div><p class="note">兩台計算機獨立運算及保存歷史。採逐步運算，例如 2＋3×4＝20；% 表示目前數字除以100，例如 200×10%＝20。計算完成按＝才記錄。</p></section>
+<p class="note footer" id="storageStatus"></p>
+</div>
+<script>
+(function () {
+  "use strict";
+
+  function start() {
+    var $ = function (id) {
+      return document.getElementById(id);
+    };
+
+    function fmt(value) {
+      return new Intl.NumberFormat("zh-TW", {
+        maximumFractionDigits: 2
+      }).format(value);
+    }
+
+    function money(value) {
+      return "$" + fmt(value);
+    }
+
+    function uid() {
+      return Date.now().toString(36) +
+        Math.random().toString(36).slice(2);
+    }
+
+    var key = "beauty-complete-workbench-v4";
+
+    var data = {
+      inputs: {},
+      products: [],
+      productMode: false,
+      prices: [],
+      a: [],
+      b: []
+    };
+
+    function save() {
+      var success = true;
+
+      try {
+        localStorage.setItem(key, JSON.stringify(data));
+      } catch (error) {
+        success = false;
+      }
+
+      $("storageStatus").textContent = success
+        ? "資料保存在目前瀏覽器。請定期匯出備份，避免清除網站資料後遺失。"
+        : "瀏覽器無法永久儲存；本次仍可使用，請在離開前匯出備份。";
+
+      return success;
+    }
+
+    try {
+      var saved = JSON.parse(
+        localStorage.getItem(key) || localStorage.getItem("beauty-complete-workbench-v3") || localStorage.getItem("beauty-complete-workbench-v2") || localStorage.getItem("beauty-complete-workbench-v1") || "null"
+      );
+
+      if (saved && typeof saved === "object") {
+        if (saved.inputs && typeof saved.inputs === "object") {
+          data.inputs = saved.inputs;
+        }
+
+        if (Array.isArray(saved.products)) {
+          data.products = saved.products;
+        }
+
+        data.productMode = saved.productMode === true;
+
+        ["prices", "a", "b"].forEach(function (name) {
+          if (Array.isArray(saved[name])) {
+            data[name] = saved[name];
+          }
+        });
+      } else {
+        var previous = JSON.parse(
+          localStorage.getItem(
+            "beauty-manual-product-cost-v4"
+          ) || "null"
+        );
+
+        if (previous && Array.isArray(previous.rows)) {
+          data.products = previous.rows;
+          data.productMode = previous.active === true;
+        }
+      }
+    } catch (error) {}
+
+    data.products = data.products
+      .filter(function (row) {
+        return row && typeof row === "object";
+      })
+      .map(function (row) {
+        return {
+          id: uid(),
+          category: row.category || "清潔",
+          name: String(row.name || ""),
+          ml: String(row.ml == null ? "" : row.ml),
+          price: String(row.price == null ? "" : row.price),
+          cost: String(row.cost == null ? "0" : row.cost),
+          selected: row.selected === true
+        };
+      });
+
+    /* 主分頁與設定頁籤：先啟用 */
+    document.querySelectorAll("[data-page]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        document.querySelectorAll(".page").forEach(function (page) {
+          page.classList.remove("active");
+        });
+
+        document.querySelectorAll(".nav button").forEach(function (tab) {
+          tab.classList.remove("active");
+        });
+
+        button.classList.add("active");
+
+        var page = $(button.getAttribute("data-page"));
+        if (page) page.classList.add("active");
+      });
+    });
+
+    document.querySelectorAll("[data-pane]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        document.querySelectorAll(".pane").forEach(function (pane) {
+          pane.classList.remove("active");
+        });
+
+        document.querySelectorAll(".tabs button").forEach(function (tab) {
+          tab.classList.remove("active");
+        });
+
+        button.classList.add("active");
+
+        var pane = $(button.getAttribute("data-pane"));
+        if (pane) pane.classList.add("active");
+      });
+    });
+
+    function markChanged() {
+      if ($("plans").querySelector(".plan")) {
+        $("priceStatus").textContent =
+          "設定已變更，請重新按「開始計算並儲存」。";
+
+        $("priceStatus").className = "status stale";
+      }
+    }
+
+    /* 產生設定欄位 */
+    var definitions = {
+      productFields: [
+        ["pc", "產品實際成本／套", 10680],
+        ["pp", "產品標示售價／套", 22800],
+        ["sc", "每堂直接成本", 850],
+        ["gm", "分潤前目標利潤率 %", 40]
+      ],
+      operationFields: [
+        ["rent", "每月房租", 8000],
+        ["util", "每月水電", 600],
+        ["mat", "每月其他耗材", 500],
+        ["staff", "美容師人數", 2],
+        ["daily", "每人每天堂數", 2],
+        ["days", "每月工作天數", 22],
+        ["usage", "預計產能使用率 %", 100]
+      ],
+      tierFields: [
+        ["low", "低階堂數", 6],
+        ["mid", "中階堂數", 10],
+        ["high", "高階堂數", 15],
+        ["share", "美容師分潤 %", 50],
+        ["le", "低階額外成本", 0],
+        ["me", "中階額外成本", 0],
+        ["he", "高階額外成本", 0]
+      ]
+    };
+
+    var inputIds = [];
+
+    Object.keys(definitions).forEach(function (containerId) {
+      var container = $(containerId);
+      container.innerHTML = "";
+
+      definitions[containerId].forEach(function (definition) {
+        var id = definition[0];
+        inputIds.push(id);
+
+        var wrapper = document.createElement("div");
+        var label = document.createElement("label");
+        var input = document.createElement("input");
+
+        label.htmlFor = id;
+        label.textContent = definition[1];
+
+        input.id = id;
+        input.type = "number";
+        input.min = "0";
+        input.step = "any";
+
+        input.value = data.inputs[id] == null
+          ? definition[2]
+          : data.inputs[id];
+
+        data.inputs[id] = input.value;
+
+        input.addEventListener("input", function () {
+          data.inputs[id] = input.value;
+          markChanged();
+          save();
+        });
+
+        wrapper.appendChild(label);
+        wrapper.appendChild(input);
+        container.appendChild(wrapper);
+      });
+    });
+
+    /* 產品勾選與成本 */
+    function productTotals() {
+      var priceCents = 0;
+      var costCents = 0;
+      var count = 0;
+      var invalid = false;
+
+      data.products.forEach(function (row) {
+        if (!row.selected) return;
+
+        count++;
+
+        var price = Number(row.price);
+        var cost = Number(row.cost);
+        var ml = Number(row.ml);
+
+        if (
+          row.price.trim() === "" ||
+          row.cost.trim() === "" ||
+          !Number.isFinite(price) ||
+          !Number.isFinite(cost) ||
+          price < 0 ||
+          cost < 0 ||
+          (
+            row.ml.trim() !== "" &&
+            (!Number.isFinite(ml) || ml < 0)
+          )
+        ) {
+          invalid = true;
+          return;
+        }
+
+        priceCents += Math.round(price * 100);
+        costCents += Math.round(cost * 100);
+      });
+
+      return {
+        price: priceCents / 100,
+        cost: costCents / 100,
+        count: count,
+        invalid: invalid
+      };
+    }
+
+    function syncProducts() {
+      var result = productTotals();
+
+      $("selectedCount").textContent =
+        "已勾選 " + result.count + " 項";
+
+      $("productPriceTotal").textContent = result.invalid
+        ? "請檢查資料"
+        : money(result.price);
+
+      $("productCostTotal").textContent = result.invalid
+        ? "請檢查資料"
+        : money(result.cost);
+
+      $("pc").readOnly = data.productMode;
+      $("pp").readOnly = data.productMode;
+
+      var message;
+
+      if (result.invalid) {
+        message = "請填妥已勾選產品的價格與成本，數字不可小於零。";
+      } else if (data.productMode) {
+        $("pc").value = result.cost.toFixed(2);
+        $("pp").value = result.price.toFixed(2);
+
+        data.inputs.pc = $("pc").value;
+        data.inputs.pp = $("pp").value;
+
+        message = result.count
+          ? "勾選產品的價格與成本已同步至上方欄位。"
+          : "目前未勾選產品，上方價格與成本已同步為 $0。";
+      } else {
+        message = "上方可手動輸入；勾選產品後改用清單合計。";
+      }
+
+      $("productStatus").textContent = message;
+      $("productStatus").className =
+        "status" + (result.invalid ? " error" : "");
+
+      save();
+      return result;
+    }
+
+    function productInput(row, property, type, title) {
+      var input = document.createElement("input");
+
+      input.type = type;
+      input.value = row[property];
+      input.placeholder = title;
+      input.setAttribute("aria-label", title);
+
+      if (type === "number") {
+        input.min = "0";
+        input.step = property === "ml" ? "any" : "0.01";
+        input.inputMode = "decimal";
+      }
+
+      input.addEventListener("input", function () {
+        row[property] = input.value;
+        markChanged();
+        syncProducts();
+      });
+
+      return input;
+    }
+
+    function moveProduct(id, direction) {
+      var current = data.products.findIndex(function (row) {
+        return row.id === id;
+      });
+
+      var target = current + direction;
+
+      if (
+        current < 0 ||
+        target < 0 ||
+        target >= data.products.length
+      ) return;
+
+      var scroll = $("productList").scrollTop;
+      var item = data.products.splice(current, 1)[0];
+
+      data.products.splice(target, 0, item);
+
+      renderProducts();
+      $("productList").scrollTop = scroll;
+      syncProducts();
+    }
+
+    var categories = ["清潔","化妝水","去角質","精華","面膜","滋養","隔離"];
+    function renderProducts() {
+      var list = $("productList"); list.innerHTML = "";
+      categories.forEach(function(category) {
+        var block=document.createElement("section"); block.className="category-block";
+        var header=document.createElement("div"); header.className="row-head";
+        var title=document.createElement("h3"); title.textContent=category;
+        var add=document.createElement("button"); add.textContent="＋ 新增產品";
+        var box=document.createElement("div"); box.className="category-products";
+        add.onclick=function(){data.products.push({id:uid(),category:category,name:"",ml:"",price:"",cost:"0",selected:false});renderProducts();syncProducts();};
+        header.append(title,add); block.append(header,box); list.append(block);
+        data.products.forEach(function(row,index){
+          if(!categories.includes(row.category)) row.category="清潔";
+          if(row.category!==category)return;
+        var card = document.createElement("div");
+        card.className =
+          "product" + (row.selected ? " selected" : "");
+
+        var order = document.createElement("div");
+        order.className = "order";
+
+        var number = document.createElement("small");
+        number.textContent = "產品 " + (index + 1);
+        order.appendChild(number);
+
+        [
+          ["↑", -1],
+          ["↓", 1]
+        ].forEach(function (definition) {
+          var button = document.createElement("button");
+          button.type = "button";
+          button.className = "tiny";
+          button.textContent = definition[0];
+
+          button.disabled =
+            index + definition[1] < 0 ||
+            index + definition[1] >= data.products.length;
+
+          button.onclick = function () {
+            moveProduct(row.id, definition[1]);
+          };
+
+          order.appendChild(button);
+        });
+
+        var top = document.createElement("div");
+        top.className = "product-top";
+
+        var check = document.createElement("input");
+        check.type = "checkbox";
+        check.checked = row.selected;
+        check.setAttribute("aria-label", "將此產品加入合計");
+
+        check.onchange = function () {
+          row.selected = check.checked;
+          data.productMode = true;
+          card.classList.toggle("selected", row.selected);
+          markChanged();
+          syncProducts();
+        };
+
+        var remove = document.createElement("button");
+        remove.type = "button";
+        remove.className = "tiny danger";
+        remove.textContent = "刪除";
+
+        remove.onclick = function () {
+          if (!confirm("確定刪除此產品？")) return;
+
+          data.products = data.products.filter(function (product) {
+            return product.id !== row.id;
+          });
+
+          renderProducts();
+          markChanged();
+          syncProducts();
+        };
+
+        top.appendChild(check);
+        top.appendChild(
+          productInput(row, "name", "text", "產品名稱")
+        );
+        top.appendChild(remove);
+
+        var fields = document.createElement("div");
+        fields.className = "fields";
+
+        [
+          ["ml", "產品 ml 數"],
+          ["price", "產品價格"],
+          ["cost", "實際成本（自行輸入）"]
+        ].forEach(function (definition) {
+          var wrapper = document.createElement("div");
+          if (definition[0] === "ml") wrapper.className = "full";
+
+          var label = document.createElement("label");
+          label.textContent = definition[1];
+
+          wrapper.appendChild(label);
+          wrapper.appendChild(
+            productInput(
+              row, definition[0], "number", definition[1]
+            )
+          );
+
+          fields.appendChild(wrapper);
+        });
+
+
+        card.appendChild(top);
+        card.appendChild(fields);
+          box.appendChild(card);
+        });
+      });
+    }
+    $("selectAll").onclick = function () {
+      data.products.forEach(function (row) {
+        row.selected = true;
+      });
+
+      data.productMode = true;
+      renderProducts();
+      markChanged();
+      syncProducts();
+    };
+
+    $("selectNone").onclick = function () {
+      data.products.forEach(function (row) {
+        row.selected = false;
+      });
+
+      data.productMode = true;
+      renderProducts();
+      markChanged();
+      syncProducts();
+    };
+
+    $("manualMode").onclick = function () {
+      data.productMode = false;
+      syncProducts();
+      markChanged();
+    };
+
+    /* 套組計算 */
+    function readSettings() {
+      var settings = {};
+
+      inputIds.forEach(function (id) {
+        var raw = $(id).value;
+        var value = Number(raw);
+
+        if (
+          raw.trim() === "" ||
+          !Number.isFinite(value) ||
+          value < 0
+        ) {
+          throw new Error("請填入有效且不小於零的設定數字。");
+        }
+
+        settings[id] = value;
+      });
+
+      ["staff", "daily", "days", "low", "mid", "high"]
+        .forEach(function (id) {
+          if (
+            settings[id] < 1 ||
+            !Number.isInteger(settings[id])
+          ) {
+            throw new Error("人數、工作天數及堂數須為正整數。");
+          }
+        });
+
+      if (settings.gm >= 100) {
+        throw new Error("目標利潤率須小於 100%。");
+      }
+
+      if (settings.share > 100) {
+        throw new Error("美容師分潤須介於 0～100%。");
+      }
+
+      if (settings.usage <= 0 || settings.usage > 100) {
+        throw new Error("產能使用率須大於 0%，且不超過 100%。");
+      }
+
+      return settings;
+    }
+
+    function compute(settings) {
+      var capacity =
+        settings.staff *
+        settings.daily *
+        settings.days *
+        settings.usage / 100;
+
+      var fixed =
+        settings.rent + settings.util + settings.mat;
+
+      var fixedPer = fixed / capacity;
+      var full = settings.sc + fixedPer;
+
+      var rows = [
+        ["低階", settings.low, settings.le],
+        ["中階", settings.mid, settings.me],
+        ["高階", settings.high, settings.he]
+      ].map(function (definition) {
+        var sessions = definition[1];
+        var extra = definition[2];
+        var direct = settings.sc * sessions;
+        var allocated = fixedPer * sessions;
+        var cost = settings.pc + direct + allocated + extra;
+
+        var price = Math.ceil(
+          cost / (1 - settings.gm / 100) / 100
+        ) * 100;
+
+        var profit = price - cost;
+        var staff = profit * settings.share / 100;
+        var company = profit - staff;
+
+        if (!Number.isFinite(price)) {
+          throw new Error("數值超出可計算範圍。");
+        }
+
+        return {
+          name: definition[0],
+          sessions: sessions,
+          extra: extra,
+          direct: direct,
+          allocated: allocated,
+          cost: cost,
+          price: price,
+          profit: profit,
+          staff: staff,
+          company: company,
+          margin: price ? profit / price * 100 : 0,
+          companyMargin: price ? company / price * 100 : 0
+        };
+      });
+
+      return {
+        capacity: capacity,
+        fixedPer: fixedPer,
+        full: full,
+        rows: rows
+      };
+    }
+
+    function line(label, value) {
+      return '<div class="line"><span>' + label +
+        '</span><b>' + value + '</b></div>';
+    }
+
+    function drawResults(settings, result) {
+      $("metrics").textContent =
+        "預計月服務 " + fmt(result.capacity) + " 堂｜" +
+        "每堂固定費用 " + money(result.fixedPer) + "｜" +
+        "每堂完整成本 " + money(result.full);
+
+      $("plans").innerHTML = result.rows.map(function (row) {
+        return (
+          '<article class="plan">' +
+          '<small>' + row.name + '方案 · ' +
+            row.sessions + ' 堂</small>' +
+          '<div class="price">' + money(row.price) + '</div>' +
+
+          line("套組總成本", money(row.cost)) +
+          line("美容師總分潤／套", money(row.staff)) +
+          line("公司保留／套", money(row.company)) +
+          line("分潤前利潤率", fmt(row.margin) + "%") +
+
+          '<details><summary>查看方案細項</summary>' +
+          '<h3>產品與服務</h3>' +
+          line("產品數量", "1 套") +
+          line("產品標示售價", money(settings.pp)) +
+          line("產品實際成本", money(settings.pc)) +
+          line("服務堂數", row.sessions + " 堂") +
+          line("每堂直接成本", money(settings.sc)) +
+          line("每堂固定費用", money(result.fixedPer)) +
+          line("整套直接服務成本", money(row.direct)) +
+          line("整套固定費用分攤", money(row.allocated)) +
+          line("額外加值成本", money(row.extra)) +
+
+          '<h3>定價與分潤</h3>' +
+          line("套組總成本", money(row.cost)) +
+          line("套組售價", money(row.price)) +
+          line("扣除產品標示價後金額",
+            money(row.price - settings.pp)) +
+          line("上述金額平均每堂",
+            money((row.price - settings.pp) / row.sessions)) +
+          line("分潤前利潤", money(row.profit)) +
+          line("美容師分潤比例", fmt(settings.share) + "%") +
+          line("美容師總分潤／套", money(row.staff)) +
+          line("公司保留／套", money(row.company)) +
+          line("公司保留利潤率", fmt(row.companyMargin) + "%") +
+          '</details></article>'
+        );
+      }).join("");
+
+      var fixed=settings.rent+settings.util+settings.mat;
+      $("plans").querySelectorAll(".plan").forEach(function(card,index){
+        var row=result.rows[index];
+        var formulas={
+          "每堂直接成本":"此項為自行輸入的每堂直接成本："+money(settings.sc)+"。未提供細部拆分，不另外推算。",
+          "每堂固定費用":"每月固定費用＝房租 "+money(settings.rent)+"＋水電 "+money(settings.util)+"＋其他耗材 "+money(settings.mat)+"＝"+money(fixed)+"。\n月服務堂數＝"+settings.staff+" 人 × "+settings.daily+" 堂 × "+settings.days+" 天 × "+settings.usage+"%＝"+fmt(result.capacity)+" 堂。\n每堂固定費用＝"+money(fixed)+" ÷ "+fmt(result.capacity)+"＝"+money(result.fixedPer),
+          "整套直接服務成本":money(settings.sc)+" × "+row.sessions+" 堂＝"+money(row.direct),
+          "整套固定費用分攤":"每堂固定費用（以未四捨五入數值計算）× "+row.sessions+" 堂＝"+money(row.allocated),
+          "套組總成本":"產品成本＋整套直接服務成本＋固定費用分攤＋額外成本\n"+money(settings.pc)+"＋"+money(row.direct)+"＋"+money(row.allocated)+"＋"+money(row.extra)+"＝"+money(row.cost),
+          "套組售價":"成本 ÷（1－目標利潤率）\n"+money(row.cost)+" ÷（1－"+settings.gm+"%）＝"+money(row.cost/(1-settings.gm/100))+"\n再向上進位至百元＝"+money(row.price),
+          "扣除產品標示價後金額":money(row.price)+"－"+money(settings.pp)+"＝"+money(row.price-settings.pp)
+        };
+        card.querySelectorAll("details .line").forEach(function(line){
+          var label=line.querySelector("span").textContent;
+          if(!formulas[label])return;
+          var button=document.createElement("button");button.className="formula-toggle";button.type="button";
+          while(line.firstChild)button.append(line.firstChild);
+          line.replaceWith(button);
+          var detail=document.createElement("div");detail.className="formula-box";detail.hidden=true;
+          button.after(detail);button.setAttribute("aria-expanded","false");
+          button.onclick=function(e){e.stopPropagation();detail.hidden=!detail.hidden;if(!detail.hidden)detail.textContent=formulas[label];button.setAttribute("aria-expanded",String(!detail.hidden));};
+        });
+      });
+      $("plans").querySelectorAll(".plan").forEach(function (card) {
+        card.onclick = function (event) {
+          if (event.target.closest("details")) return;
+          if (window.getSelection().toString()) return;
+
+          var details = card.querySelector("details");
+          details.open = !details.open;
+        };
+      });
+    }
+
+    function drawHistory() {
+      var box=$("priceHistory"); box.innerHTML="";
+      if(!data.prices.length){box.textContent="尚無定價紀錄。";return;}
+      data.prices.forEach(function(item){
+        if(!item.result || !item.inputs)return;
+        var entry=document.createElement("div");entry.className="history-entry";
+        var header=document.createElement("div");header.className="row-head";
+        var time=document.createElement("strong");time.textContent=new Date(item.time).toLocaleString("zh-TW");
+        var remove=document.createElement("button");remove.className="danger";remove.textContent="刪除";
+        remove.onclick=function(){if(!confirm("刪除此筆定價歷史？"))return;data.prices=data.prices.filter(function(x){return x.id!==item.id});save();drawHistory();};
+        header.append(time,remove);
+        var p=document.createElement("p");p.textContent=item.result.rows.map(function(x){return x.name+" "+money(x.price)}).join(" ／ ");
+        var toggle=document.createElement("button");toggle.textContent="查看本次方案";toggle.setAttribute("aria-expanded","false");
+        var panel=document.createElement("div");panel.className="history-plan-box";panel.hidden=true;
+        toggle.onclick=function(){panel.hidden=!panel.hidden;toggle.textContent=panel.hidden?"查看本次方案":"收合本次方案";toggle.setAttribute("aria-expanded",String(!panel.hidden));};
+        entry.append(header,p,toggle,panel);box.append(entry);
+        renderHistorical(item,panel);
+      });
+    }
+    function renderHistorical(item,panel){
+      var main=$("plans"),metrics=$("metrics");
+      var fragment=document.createDocumentFragment();
+      while(main.firstChild)fragment.append(main.firstChild);
+      var oldText=metrics.textContent;
+      drawResults(item.inputs,item.result);
+      while(main.firstChild)panel.append(main.firstChild);
+      main.append(fragment);metrics.textContent=oldText;
+    }
+    $("calculatePrice").onclick = function () {
+      try {
+        if (data.productMode && syncProducts().invalid) {
+          throw new Error("請先修正已勾選產品的資料。");
+        }
+
+        var settings = readSettings();
+        var result = compute(settings);
+
+        drawResults(settings, result);
+
+        data.prices.unshift({
+          id: uid(),
+          time: new Date().toISOString(),
+          inputs: settings,
+          result: result,
+          products: JSON.parse(JSON.stringify(
+            data.products.filter(function (row) {
+              return data.productMode && row.selected;
+            })
+          ))
+        });
+
+        var persisted = save();
+        drawHistory();
+
+        $("priceStatus").className = "status";
+        $("priceStatus").textContent = persisted
+          ? "計算完成，已儲存定價與產品快照。"
+          : "計算完成，紀錄僅暫存；請匯出備份。";
+      } catch (error) {
+        $("priceStatus").className = "status error";
+        $("priceStatus").textContent = error.message;
+      }
+    };
+
+    $("clearPrices").onclick = function () {
+      if (!confirm("清空所有定價歷史？產品清單不會刪除。")) return;
+
+      data.prices = [];
+      save();
+      drawHistory();
+    };
+
+    /* 匯出 */
+    function createPdfWindow(title, bodyHtml) {
+  var win = window.open("", "_blank", "width=900,height=700");
+
+  if (!win) {
+    alert("請允許瀏覽器開啟新視窗，才能匯出 PDF。");
+    return;
+  }
+
+  win.document.write(
+    '<!DOCTYPE html><html lang="zh-Hant"><head>' +
+    '<meta charset="UTF-8">' +
+    '<title>' + title + '</title>' +
+    '<style>' +
+    'body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#203b34;margin:28px;line-height:1.7}' +
+    'h1{font-size:22px;margin:0 0 6px}' +
+    'h2{font-size:16px;margin:22px 0 8px;border-bottom:1px solid #dfe6da;padding-bottom:6px}' +
+    'h3{font-size:13px;margin:16px 0 6px}' +
+    '.meta{color:#738078;font-size:12px;margin-bottom:18px}' +
+    'table{width:100%;border-collapse:collapse;font-size:12px;margin:8px 0 18px}' +
+    'th,td{border-bottom:1px solid #dfe6da;padding:8px;text-align:left;vertical-align:top}' +
+    'th{background:#f5f7f1;color:#738078;font-weight:600}' +
+    'td.num,th.num{text-align:right;white-space:nowrap}' +
+    '.plan{border:1px solid #dfe6da;border-radius:12px;padding:14px;margin-bottom:14px;break-inside:avoid}' +
+    '.plan h3{margin:0 0 8px}' +
+    '.row{display:flex;justify-content:space-between;gap:12px;font-size:12px;padding:5px 0;border-bottom:1px solid #eef2ea}' +
+    '.row b{text-align:right;white-space:nowrap}' +
+    '.note{font-size:11px;color:#738078;margin-top:8px}' +
+    '@media print{body{margin:12mm}h2{break-after:avoid}.plan{break-inside:avoid}}' +
+    '</style></head><body>' +
+    '<h1>' + title + '</h1>' +
+    '<div class="meta">匯出時間：' +
+    new Date().toLocaleString("zh-TW") +
+    '</div>' + bodyHtml +
+    '<p class="note">本文件由美容定價與分潤工作台產生。</p>' +
+    '</body></html>'
+  );
+
+  win.document.close();
+  win.focus();
+  win.print();
+}
+
+function exportAllPdf() {
+  var products = data.products.map(function (row, index) {
+    return (
+      '<tr>' +
+      '<td>' + (index + 1) + '</td>' +
+      '<td>' + (row.category || "未分類") + '</td>' +
+      '<td>' + (row.name || "未命名產品") + '</td>' +
+      '<td class="num">' + (row.ml || "-") + '</td>' +
+      '<td class="num">' + (row.selected ? "已勾選" : "未勾選") + '</td>' +
+      '<td class="num">$' + (Number(row.price) || 0).toLocaleString("zh-TW") + '</td>' +
+      '<td class="num">$' + (Number(row.cost) || 0).toLocaleString("zh-TW") + '</td>' +
+      '</tr>'
+    );
+  }).join("");
+
+  var history = data.prices.map(function (item, index) {
+    var rows = (item.result && item.result.rows || []).map(function (row) {
+      return (
+        '<div class="row"><span>' + row.name + '方案 · ' +
+        row.sessions + ' 堂</span><b>$' +
+        Number(row.price).toLocaleString("zh-TW") + '</b></div>'
+      );
+    }).join("");
+
+    return (
+      '<div class="plan">' +
+      '<h3>紀錄 ' + (index + 1) + '：' +
+      new Date(item.time).toLocaleString("zh-TW") + '</h3>' +
+      rows +
+      '</div>'
+    );
+  }).join("");
+
+  var html =
+    '<h2>產品清單</h2>' +
+    '<table><thead><tr>' +
+    '<th>#</th><th>分類</th><th>產品名稱</th><th class="num">ml</th>' +
+    '<th class="num">狀態</th><th class="num">價格</th><th class="num">成本</th>' +
+    '</tr></thead><tbody>' + (products || '<tr><td colspan="7">尚無產品資料。</td></tr>') +
+    '</tbody></table>' +
+    '<h2>定價歷史</h2>' +
+    (history || '<p>尚無定價歷史。</p>');
+
+  createPdfWindow("美容工作台完整備份", html);
+}
+
+function exportHistoryPdf() {
+  var history = data.prices.map(function (item, index) {
+    var rows = (item.result && item.result.rows || []).map(function (row) {
+      return (
+        '<div class="row"><span>' + row.name + '方案 · ' +
+        row.sessions + ' 堂</span><b>$' +
+        Number(row.price).toLocaleString("zh-TW") + '</b></div>'
+      );
+    }).join("");
+
+    var products = (item.products || []).map(function (product) {
+      return (
+        '<div class="row"><span>' + (product.name || "未命名產品") +
+        '｜' + (product.ml || "未填") + ' ml</span><b>價格 $' +
+        Number(product.price).toLocaleString("zh-TW") +
+        '｜成本 $' + Number(product.cost).toLocaleString("zh-TW") +
+        '</b></div>'
+      );
+    }).join("");
+
+    return (
+      '<div class="plan">' +
+      '<h3>紀錄 ' + (index + 1) + '：' +
+      new Date(item.time).toLocaleString("zh-TW") + '</h3>' +
+      rows +
+      '<h3>產品快照</h3>' +
+      (products || '<p>本次沒有產品清單快照。</p>') +
+      '</div>'
+    );
+  }).join("");
+
+  createPdfWindow("美容套組定價歷史", history || '<p>尚無定價歷史。</p>');
+}
+
+$("exportAll").onclick = exportAllPdf;
+
+$("exportHistory").onclick = exportHistoryPdf;
+    /* 兩台一般計算機 */
+    var calculators = {};
+
+    function newCalculator() {
+      return {
+        display: "0",
+        left: null,
+        operator: null,
+        replace: true,
+        expression: "",
+        error: ""
+      };
+    }
+
+    function arithmetic(a, b, operator) {
+      var value;
+
+      if (operator === "+") value = a + b;
+      else if (operator === "−") value = a - b;
+      else if (operator === "×") value = a * b;
+      else {
+        if (b === 0) throw new Error("不可除以零");
+        value = a / b;
+      }
+
+      if (!Number.isFinite(value)) {
+        throw new Error("超出計算範圍");
+      }
+
+      return Number(value.toPrecision(12));
+    }
+
+    function drawCalculator(id) {
+      var state = calculators[id];
+
+      $(id + "Display").textContent =
+        state.error || state.display;
+
+      $(id + "Expression").textContent =
+        state.expression || "請輸入數字";
+
+      var history = $(id + "History");
+      history.innerHTML = "";
+
+      if (!data[id].length) {
+        history.textContent = "尚無計算紀錄。";
+        return;
+      }
+
+      data[id].forEach(function (item) {
+        var row = document.createElement("div");
+        row.className = "calc-record";
+
+        var text = document.createElement("span");
+        text.textContent =
+          item.expression + " = " + item.answer;
+
+        var remove = document.createElement("button");
+        remove.className = "tiny danger";
+        remove.textContent = "刪除";
+
+        remove.onclick = function () {
+          data[id] = data[id].filter(function (record) {
+            return record.id !== item.id;
+          });
+
+          save();
+          drawCalculator(id);
+        };
+
+        row.appendChild(text);
+        row.appendChild(remove);
+        history.appendChild(row);
+      });
+    }
+
+    function press(id, key) {
+      var state = calculators[id];
+
+      try {
+        if (key === "AC") {
+          calculators[id] = newCalculator();
+          drawCalculator(id);
+          return;
+        }
+
+        if (state.error) {
+          calculators[id] = newCalculator();
+          state = calculators[id];
+        }
+
+        if (/^\d$/.test(key)) {
+          if (state.replace) {
+            state.display = key;
+            state.replace = false;
+            if (!state.operator) state.expression = "";
+          } else if (state.display === "0") {
+            state.display = key;
+          } else if (
+            state.display.replace(/[-.]/g, "").length < 15
+          ) {
+            state.display += key;
+          }
+        } else if (key === ".") {
+          if (state.replace) {
+            state.display = "0";
+            state.replace = false;
+          }
+
+          if (state.display.indexOf(".") === -1) {
+            state.display += ".";
+          }
+        } else if (key === "⌫") {
+          if (!state.replace) {
+            state.display = state.display.slice(0, -1) || "0";
+            if (state.display === "-") state.display = "0";
+          }
+        } else if (key === "±") {
+          state.display = String(-Number(state.display));
+          state.replace = false;
+        } else if (key === "%") {
+          state.display = String(Number(state.display) / 100);
+          state.replace = false;
+        } else if (["+", "−", "×", "÷"].indexOf(key) !== -1) {
+          var current = Number(state.display);
+
+          if (state.operator && !state.replace) {
+            current = arithmetic(
+              state.left, current, state.operator
+            );
+          }
+
+          state.left = current;
+          state.display = String(current);
+          state.operator = key;
+          state.expression = current + " " + key;
+          state.replace = true;
+        } else if (key === "=") {
+          if (
+            state.operator !== null &&
+            state.left !== null &&
+            !state.replace
+          ) {
+            var expression =
+              state.left + " " +
+              state.operator + " " +
+              state.display;
+
+            var answer = arithmetic(
+              state.left,
+              Number(state.display),
+              state.operator
+            );
+
+            data[id].unshift({
+              id: uid(),
+              time: new Date().toISOString(),
+              expression: expression,
+              answer: answer
+            });
+
+            state.display = String(answer);
+            state.expression = expression + " =";
+            state.left = null;
+            state.operator = null;
+            state.replace = true;
+
+            save();
+          }
+        }
+      } catch (error) {
+        state.error = error.message;
+      }
+
+      drawCalculator(id);
+    }
+
+    $("calcs").innerHTML = "";
+
+    ["a", "b"].forEach(function (id) {
+      calculators[id] = newCalculator();
+
+      var card = document.createElement("section");
+      card.className = "card";
+
+      card.innerHTML =
+        '<h2>計算機 ' + id.toUpperCase() + '</h2>' +
+        '<div class="display">' +
+          '<div class="expression" id="' +
+            id + 'Expression"></div>' +
+          '<div class="answer" id="' +
+            id + 'Display">0</div>' +
+        '</div>' +
+        '<div class="keys" id="' + id + 'Keys"></div>' +
+        '<div class="row-head section-gap">' +
+          '<h3>計算歷史</h3>' +
+          '<button class="tiny danger" id="' +
+            id + 'Clear">清空此台</button>' +
+        '</div>' +
+        '<div class="calc-history" id="' +
+          id + 'History"></div>';
+
+      $("calcs").appendChild(card);
+
+      [
+        "AC", "⌫", "%", "÷",
+        "7", "8", "9", "×",
+        "4", "5", "6", "−",
+        "1", "2", "3", "+",
+        "±", "0", ".", "="
+      ].forEach(function (key) {
+        var button = document.createElement("button");
+        button.type = "button";
+        button.textContent = key;
+
+        if (["+", "−", "×", "÷"].indexOf(key) !== -1) {
+          button.className = "op";
+        }
+
+        if (key === "=") button.className = "eq";
+
+        button.onclick = function () {
+          press(id, key);
+        };
+
+        $(id + "Keys").appendChild(button);
+      });
+
+      $(id + "Clear").onclick = function () {
+        if (!confirm(
+          "清空計算機 " + id.toUpperCase() + " 的歷史？"
+        )) return;
+
+        data[id] = [];
+        save();
+        drawCalculator(id);
+      };
+
+      drawCalculator(id);
+    });
+
+    renderProducts();
+    syncProducts();
+    drawHistory();
+    save();
+
+    $("priceStatus").textContent =
+      "工作台已載入，可以切換分頁及開始計算。";
+  }
+
+  function showStartError(error) {
+    var box = document.getElementById("priceStatus");
+
+    if (box) {
+      box.className = "status error";
+      box.textContent =
+        "初始化失敗：" + error.message;
+    }
+  }
+
+  function initialize() {
+    try {
+      start();
+    } catch (error) {
+      showStartError(error);
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      initialize
+    );
+  } else {
+    initialize();
+  }
+})();
+</script>
+<script>(function(){var p=document.getElementById("purchasePrice"),d=document.getElementById("purchaseDiscount"),out=document.getElementById("purchaseResult");var key="beauty-purchase-calculator";try{var saved=JSON.parse(localStorage.getItem(key)||"null");if(saved){p.value=saved.price;d.value=saved.discount}}catch(e){}function calc(){var a=Number(p.value),b=Number(d.value);if(p.value===""||d.value===""||!Number.isFinite(a)||!Number.isFinite(b)||a<0||b<0||b>100){out.textContent="請輸入有效售價及0～100%的折數。";return}var f=function(x){return "$"+new Intl.NumberFormat("zh-TW",{maximumFractionDigits:2}).format(x)};out.textContent="進貨成本＝標示售價 × 進貨折數\n"+f(a)+" × "+b+"%＝"+f(a*b/100)+"\n折價金額："+f(a-a*b/100)+"\n此試算不會自動覆蓋產品成本。";try{localStorage.setItem(key,JSON.stringify({price:p.value,discount:d.value}))}catch(e){}}p.addEventListener("input",calc);d.addEventListener("input",calc);calc();})();</script></body>
+</html>
