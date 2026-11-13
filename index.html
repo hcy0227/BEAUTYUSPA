@@ -688,10 +688,14 @@ input[type=number]{text-align:right}
       };
     }
 
-    function openCustomerPage(selectedResult){
-      // 未指定歷史紀錄時，使用最新一次已儲存的計算結果。
+    function openCustomerPage(selectedResult, selectedPricingProducts, selectedMapping){
+      // 選取歷史紀錄時，使用該筆歷史結果及產品配貨快照，不改讀最新計算。
       var latestResult = selectedResult || (data.prices.length && data.prices[0].result
         ? data.prices[0].result : data.lastResult);
+      var productSource = Array.isArray(selectedPricingProducts)
+        ? selectedPricingProducts : data.pricingProducts;
+      var mappingSource = Array.isArray(selectedMapping)
+        ? selectedMapping : data.customerMapping;
       if(!latestResult || !Array.isArray(latestResult.rows) || latestResult.rows.length<3){
         alert("請先在「套組成本分析」按「開始計算並儲存」，確認三組價格已完成計算。");
         return;
@@ -701,9 +705,9 @@ input[type=number]{text-align:right}
       var planKeys=["basic","advanced","premium"];
       var customerRows=[0,1,2].map(function(t){
         var sourceIndex=-1;
-        data.customerMapping.forEach(function(v,idx){if(v===t&&sourceIndex<0)sourceIndex=idx;});
+        mappingSource.forEach(function(v,idx){if(v===t&&sourceIndex<0)sourceIndex=idx;});
         var row=sourceIndex>=0?rows[sourceIndex]:{price:0,sessions:0};
-        var products=sourceIndex<0?[]:data.pricingProducts.filter(function(p){
+        var products=sourceIndex<0?[]:productSource.filter(function(p){
           return p.plans&&Number(p.plans[planKeys[t]])>0;
         }).map(function(p){
           return {name:String(p.name||"未命名產品"),ml:String(p.ml||""),quantity:Number(p.plans[planKeys[t]])||0};
@@ -723,6 +727,8 @@ input[type=number]{text-align:right}
       customerUrl.searchParams.set("sync", Date.now().toString());
       window.location.assign(customerUrl.href);
     }
+    // 歷史定價不保留產品配貨數量快照。
+    data.prices.forEach(function(item){ if(item && Object.prototype.hasOwnProperty.call(item,"pricingProducts")) delete item.pricingProducts; });
     data.pricingProducts.forEach(function(p){
       p.plans=p.plans||{};
       ["basic","advanced","premium"].forEach(function(k){
@@ -941,13 +947,19 @@ input[type=number]{text-align:right}
       var oldText=metrics.textContent;
       // 歷史紀錄只供檢視，不得覆蓋目前最新計算結果。
       var latestResult=data.lastResult;
+      var currentMapping=data.customerMapping;
+      data.customerMapping=Array.isArray(item.customerMapping)
+        ? item.customerMapping.slice() : [-1,-1,-1];
       drawResults(item.inputs,item.result);
+      item.customerMapping=data.customerMapping.slice();
+      data.customerMapping=currentMapping;
       data.lastResult=latestResult;
       panel.querySelectorAll(".map-select").forEach(function(sel){
         sel.onchange=function(){
-          data.customerMapping[Number(sel.dataset.index)]=Number(sel.value);
+          if(!Array.isArray(item.customerMapping))item.customerMapping=[-1,-1,-1];
+          item.customerMapping[Number(sel.dataset.index)]=Number(sel.value);
           save();
-          openCustomerPage(item.result);
+          openCustomerPage(item.result, data.pricingProducts, item.customerMapping);
         };
       });
       while(main.firstChild)panel.append(main.firstChild);
@@ -975,7 +987,8 @@ input[type=number]{text-align:right}
             data.products.filter(function (row) {
               return data.productMode && row.selected;
             })
-          ))
+          )),
+          customerMapping: [-1, -1, -1]
         });
 
         var persisted = save();
