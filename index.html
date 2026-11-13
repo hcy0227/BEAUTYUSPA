@@ -183,6 +183,13 @@ input[type=number]{text-align:right}
             data[name] = saved[name];
           }
         });
+
+        // 還原最近一次計算結果，避免重新整理後顧客端讀不到套組價格。
+        if (saved.lastResult && Array.isArray(saved.lastResult.rows)) {
+          data.lastResult = saved.lastResult;
+        } else if (data.prices.length && data.prices[0].result && Array.isArray(data.prices[0].result.rows)) {
+          data.lastResult = data.prices[0].result;
+        }
       } else {
         var previous = JSON.parse(
           localStorage.getItem(
@@ -691,7 +698,17 @@ input[type=number]{text-align:right}
         alert("請先在「套組成本分析」按「開始計算並儲存」，再開啟顧客套組。");
         return;
       }
-      var rows=data.lastResult.rows;
+      // 優先使用目前頁面中的結果；若重新載入後尚未還原，則取最近一筆已儲存計算紀錄。
+      var latestResult=data.lastResult;
+      if(!latestResult && data.prices.length && data.prices[0].result){
+        latestResult=data.prices[0].result;
+        data.lastResult=latestResult;
+      }
+      if(!latestResult || !Array.isArray(latestResult.rows) || latestResult.rows.length<3){
+        alert("找不到完整的三組套組計算結果，請先重新計算並儲存。");
+        return;
+      }
+      var rows=latestResult.rows;
       var planKeys=["basic","advanced","premium"];
       var customerRows=[0,1,2].map(function(t){
         var sourceIndex=-1;
@@ -709,8 +726,9 @@ input[type=number]{text-align:right}
         alert("無法儲存顧客方案資料，請確認瀏覽器允許網站儲存資料。");
         return;
       }
-      var w=window.open("customer.html","_blank");
-      if(!w){alert("請允許開啟彈出視窗，才能顯示顧客套組頁面。");}
+      // 在同一個分頁轉跳至顧客端，不另開新視窗。
+      // 先完成 localStorage 寫入，再導向顧客頁面，顧客端即可讀取最新計算結果。
+      window.location.href = new URL("customer.html", window.location.href).href;
     }
     var pricingCategories=["清潔","化妝水","去角質","精華","面膜","滋養","隔離"];
     var planKeys=["basic","advanced","premium"];
