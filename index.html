@@ -688,54 +688,56 @@ input[type=number]{text-align:right}
       };
     }
 
-    function openCustomerPage(selectedResult, selectedPricingProducts, selectedMapping){
-      // 選取歷史紀錄時，使用該筆歷史結果及產品配貨快照，不改讀最新計算。
-      var latestResult = selectedResult || (data.prices.length && data.prices[0].result
-        ? data.prices[0].result : data.lastResult);
-      var productSource = Array.isArray(selectedPricingProducts)
-        ? selectedPricingProducts : data.pricingProducts;
-      var mappingSource = Array.isArray(selectedMapping)
-        ? selectedMapping : data.customerMapping;
-      if(!latestResult || !Array.isArray(latestResult.rows) || latestResult.rows.length<3){
-        alert("請先在「套組成本分析」按「開始計算並儲存」，確認三組價格已完成計算。");
-        return;
-      }
-      var rows=latestResult.rows;
+    function openCustomerPage(){
+      // 彙整所有歷史紀錄：只要該筆紀錄有選擇客戶端對應方案，就同步一筆。
       var planKeys=["basic","advanced","premium"];
-      var customerRows=[0,1,2].map(function(t){
-        var sourceIndex=-1;
-        mappingSource.forEach(function(v,idx){if(v===t&&sourceIndex<0)sourceIndex=idx;});
-        var row=sourceIndex>=0?rows[sourceIndex]:{price:0,sessions:0};
-        // 顧客端第 t 組若對應公司端第 sourceIndex 組，
-        // 產品配貨也必須讀取該公司端組別的 key，而不是顧客端組別的 key。
-        var sourcePlanKey=sourceIndex<0?null:planKeys[sourceIndex];
-        var products=sourceIndex<0?[]:productSource.filter(function(p){
-          return p.plans&&Number(p.plans[sourcePlanKey])>0;
-        }).map(function(p){
-          return {name:String(p.name||"未命名產品"),ml:String(p.ml||""),quantity:Number(p.plans[sourcePlanKey])||0};
+      var targetNames=["煥顏基礎方案","緊緻進階方案","奢寵全效方案"];
+      var productSource=data.pricingProducts||[];
+      var customerRows=[];
+      (data.prices||[]).forEach(function(item){
+        if(!item || !item.result || !Array.isArray(item.result.rows))return;
+        var mapping=Array.isArray(item.customerMapping)?item.customerMapping:[-1,-1,-1];
+        var historicalProducts=productSource;
+        item.result.rows.forEach(function(row,sourceIndex){
+          var targetIndex=Number(mapping[sourceIndex]);
+          if(!Number.isInteger(targetIndex) || targetIndex<0 || targetIndex>2)return;
+          var sourcePlanKey=planKeys[sourceIndex];
+          var products=historicalProducts.filter(function(p){
+            return p.plans&&Number(p.plans[sourcePlanKey])>0;
+          }).map(function(p){
+            return {name:String(p.name||"未命名產品"),ml:String(p.ml||""),quantity:Number(p.plans[sourcePlanKey])||0};
+          });
+          customerRows.push({
+            targetIndex:targetIndex,
+            planName:targetNames[targetIndex],
+            price:Number(row.price)||0,
+            sessions:Number(row.sessions)||0,
+            sourcePlanName:String(row.name||("公司端第"+(sourceIndex+1)+"組")),
+            historyTime:item.time||"",
+            products:products
+          });
         });
-        return {
-          price:sourceIndex<0?0:(row.price||0),
-          sessions:sourceIndex<0?0:(row.sessions||0),
-          sourcePlanName:sourceIndex<0?"尚未連動":String(row.name||("公司端第"+(sourceIndex+1)+"組")),
-          products:products
-        };
       });
-      var payload={rows:customerRows,updatedAt:new Date().toISOString()};
-      try{
-        localStorage.setItem("beautyCustomerData",JSON.stringify(payload));
-      }catch(error){
-        alert("無法儲存顧客方案資料，請確認瀏覽器允許網站儲存資料。");
+      // 尚無歷史紀錄時，允許同步目前已計算的方案。
+      if(!customerRows.length && data.lastResult && Array.isArray(data.lastResult.rows)){
+        (data.customerMapping||[-1,-1,-1]).forEach(function(targetIndex,sourceIndex){
+          if(targetIndex<0 || targetIndex>2)return;
+          var row=data.lastResult.rows[sourceIndex]||{};
+          var key=planKeys[sourceIndex];
+          customerRows.push({targetIndex:targetIndex,planName:targetNames[targetIndex],price:Number(row.price)||0,sessions:Number(row.sessions)||0,sourcePlanName:String(row.name||("公司端第"+(sourceIndex+1)+"組")),historyTime:"目前方案",products:productSource.filter(function(p){return p.plans&&Number(p.plans[key])>0;}).map(function(p){return {name:String(p.name||"未命名產品"),ml:String(p.ml||""),quantity:Number(p.plans[key])||0};})});
+        });
+      }
+      if(!customerRows.length){
+        alert("目前沒有已選擇客戶端對應方案的歷史紀錄，請先在任一筆歷史方案中選擇要同步的客戶端方案。");
         return;
       }
-      // 在同一個分頁轉跳至顧客端，不另開新視窗。
-      // 先完成 localStorage 寫入，再導向顧客頁面，顧客端即可讀取最新計算結果。
-      var customerUrl = new URL("customer.html", window.location.href);
-      customerUrl.searchParams.set("sync", Date.now().toString());
+      var payload={rows:customerRows,updatedAt:new Date().toISOString()};
+      try{localStorage.setItem("beautyCustomerData",JSON.stringify(payload));}
+      catch(error){alert("無法儲存顧客方案資料，請確認瀏覽器允許網站儲存資料。");return;}
+      var customerUrl=new URL("customer.html",window.location.href);
+      customerUrl.searchParams.set("sync",Date.now().toString());
       window.location.assign(customerUrl.href);
     }
-    // 歷史定價不保留產品配貨數量快照。
-    data.prices.forEach(function(item){ if(item && Object.prototype.hasOwnProperty.call(item,"pricingProducts")) delete item.pricingProducts; });
     data.pricingProducts.forEach(function(p){
       p.plans=p.plans||{};
       ["basic","advanced","premium"].forEach(function(k){
@@ -889,6 +891,7 @@ input[type=number]{text-align:right}
         sel.onchange=function(){
           data.customerMapping[Number(sel.dataset.index)]=Number(sel.value);
           save();
+          if(Number(sel.value)!==-1)openCustomerPage();
         };
       });
 
@@ -968,8 +971,8 @@ input[type=number]{text-align:right}
           save();
           // 選擇「無同步客戶端」時，只保存歷史設定，不更新顧客端。
           if(Number(sel.value)===-1)return;
-          // 使用目前選取的歷史定價結果，不改讀最新計算結果。
-          openCustomerPage(item.result, data.pricingProducts, item.customerMapping);
+          // 重新彙整所有已選擇對應方案的歷史紀錄。
+          openCustomerPage();
         };
       });
       while(main.firstChild)panel.append(main.firstChild);
@@ -993,11 +996,6 @@ input[type=number]{text-align:right}
           time: new Date().toISOString(),
           inputs: settings,
           result: result,
-          products: JSON.parse(JSON.stringify(
-            data.products.filter(function (row) {
-              return data.productMode && row.selected;
-            })
-          )),
           customerMapping: [-1, -1, -1]
         });
 
@@ -1006,7 +1004,7 @@ input[type=number]{text-align:right}
 
         $("priceStatus").className = "status";
         $("priceStatus").textContent = persisted
-          ? "計算完成，已儲存定價與產品快照。"
+          ? "計算完成，已儲存定價紀錄。"
           : "計算完成，紀錄僅暫存；請匯出備份。";
       } catch (error) {
         $("priceStatus").className = "status error";
@@ -1136,8 +1134,6 @@ function exportHistoryPdf() {
       '<h3>紀錄 ' + (index + 1) + '：' +
       new Date(item.time).toLocaleString("zh-TW") + '</h3>' +
       rows +
-      '<h3>產品快照</h3>' +
-      (products || '<p>本次沒有產品清單快照。</p>') +
       '</div>'
     );
   }).join("");
