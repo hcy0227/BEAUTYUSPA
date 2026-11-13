@@ -1123,7 +1123,7 @@ function exportHistoryPdf() {
 }
 
 $("exportAll").onclick = exportAllPdf;
-    $("exportCustomer").onclick = openCustomerPage;
+    $("exportCustomer").onclick = function () { openCustomerPage(); };
     renderPricingProducts();
 
 $("exportHistory").onclick = exportHistoryPdf;
