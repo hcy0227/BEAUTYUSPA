@@ -70,7 +70,7 @@ input[type=number]{text-align:right}
 <body>
 <div class="app">
 <header class="top"><div><div class="brand">BEAUTY．U．SPA COMPANY</div><h1>美瑀SPA美學｜產品配貨分析</h1><small>產品配貨 · 套組方案 · 雙計算機</small></div><button id="exportAll">匯出全部資料備份</button>
-<button id="exportCustomer">匯出顧客套組</button><button id="cloudSyncButton">登入並同步雲端</button><small id="cloudSyncStatus" role="status">雲端尚未同步</small></header>
+<button id="exportCustomer">匯出顧客套組</button></header>
 <nav class="nav"><button class="active" data-page="pricing">套組成本分析</button><button data-page="calculators">一般計算機 A／B</button>
 <button data-page="productPricing">產品定價</button></nav>
 <section class="page active" id="pricing">
@@ -688,73 +688,26 @@ input[type=number]{text-align:right}
       };
     }
 
-    var SUPABASE_URL="https://vvsiridpvaovcafmfbvd.supabase.co";
-    var SUPABASE_ANON_KEY="sb_publishable_X1grp4ZPnv4YesF9oYv97Q_JBqBDJAM";
-    var SUPABASE_TABLE="beauty_customer_sync";
-    var SUPABASE_SESSION_KEY="beautySpaSupabaseSession";
-
-    function setCloudStatus(message,isError){
-      var el=$("cloudSyncStatus");
-      if(el){el.textContent=message;el.style.color=isError?"#a05542":"#738078";}
-    }
-
-    async function getCompanyAccessToken(){
-      var session=null;
-      try{session=JSON.parse(localStorage.getItem(SUPABASE_SESSION_KEY)||"null");}catch(e){}
-      if(session&&session.access_token&&session.expires_at>Date.now()+60000)return session.access_token;
-
-      if(session&&session.refresh_token){
-        try{
-          var refreshed=await fetch(SUPABASE_URL+"/auth/v1/token?grant_type=refresh_token",{
-            method:"POST",
-            headers:{"Content-Type":"application/json","apikey":SUPABASE_ANON_KEY},
-            body:JSON.stringify({refresh_token:session.refresh_token})
-          });
-          if(refreshed.ok){
-            var next=await refreshed.json();
-            next.expires_at=Date.now()+(Number(next.expires_in)||3600)*1000;
-            localStorage.setItem(SUPABASE_SESSION_KEY,JSON.stringify(next));
-            return next.access_token;
-          }
-        }catch(e){}
-        localStorage.removeItem(SUPABASE_SESSION_KEY);
-      }
-
-      var email=window.prompt("請輸入公司端 Supabase 登入 Email（需先在 Supabase 建立使用者）");
-      if(!email)return null;
-      var password=window.prompt("請輸入 Supabase 密碼。密碼只會送往 Supabase，不會傳給 ChatGPT。");
-      if(!password)return null;
-      var response=await fetch(SUPABASE_URL+"/auth/v1/token?grant_type=password",{
-        method:"POST",
-        headers:{"Content-Type":"application/json","apikey":SUPABASE_ANON_KEY},
-        body:JSON.stringify({email:email.trim(),password:password})
-      });
-      var result=await response.json();
-      if(!response.ok)throw new Error(result.msg||result.message||result.error_description||"Supabase 登入失敗，請確認帳號密碼。");
-      result.expires_at=Date.now()+(Number(result.expires_in)||3600)*1000;
-      localStorage.setItem(SUPABASE_SESSION_KEY,JSON.stringify(result));
-      return result.access_token;
-    }
-
-    async function syncCustomerData(){
-      // 每一筆歷史紀錄各自依照當時選取的對應方案同步；產品配貨不另存快照。
+    function syncCustomerData(){
+      // 彙整所有歷史紀錄：只要該筆紀錄有選擇客戶端對應方案，就同步一筆；不切換頁面。
       var planKeys=["basic","advanced","premium"];
       var targetNames=["煥顏基礎方案","緊緻進階方案","奢寵全效方案"];
+      var productSource=data.pricingProducts||[];
       var customerRows=[];
       (data.prices||[]).forEach(function(item){
-        if(!item||!item.result||!Array.isArray(item.result.rows))return;
+        if(!item || !item.result || !Array.isArray(item.result.rows))return;
         var mapping=Array.isArray(item.customerMapping)?item.customerMapping:[-1,-1,-1];
+        var historicalProducts=productSource;
         item.result.rows.forEach(function(row,sourceIndex){
           var targetIndex=Number(mapping[sourceIndex]);
-          if(!Number.isInteger(targetIndex)||targetIndex<0||targetIndex>2)return;
+          if(!Number.isInteger(targetIndex) || targetIndex<0 || targetIndex>2)return;
           var sourcePlanKey=planKeys[sourceIndex];
-          var products=(data.pricingProducts||[]).filter(function(p){
+          var products=historicalProducts.filter(function(p){
             return p.plans&&Number(p.plans[sourcePlanKey])>0;
           }).map(function(p){
             return {name:String(p.name||"未命名產品"),ml:String(p.ml||""),quantity:Number(p.plans[sourcePlanKey])||0};
           });
           customerRows.push({
-            id:String(item.id||item.time||"")+"-"+sourceIndex,
             targetIndex:targetIndex,
             planName:targetNames[targetIndex],
             price:Number(row.price)||0,
@@ -765,36 +718,19 @@ input[type=number]{text-align:right}
           });
         });
       });
+      // 不以目前計算結果覆蓋歷史同步；所有歷史都依各自 mapping 決定是否出現在客戶端。
+      // 即使 customerRows 為空也寫入空資料，讓客戶端能即時清除已取消的同步方案。
       var payload={rows:customerRows,updatedAt:new Date().toISOString()};
-      // 保留本機副本作為備援，但客戶端正式資料只從 Supabase 讀取。
-      try{localStorage.setItem("beautyCustomerData",JSON.stringify(payload));}catch(e){}
-      try{
-        setCloudStatus("正在連線雲端…",false);
-        var token=await getCompanyAccessToken();
-        if(!token){setCloudStatus("尚未登入，未同步",true);return false;}
-        var response=await fetch(SUPABASE_URL+"/rest/v1/"+SUPABASE_TABLE+"?on_conflict=id",{
-          method:"POST",
-          headers:{
-            "Content-Type":"application/json",
-            "apikey":SUPABASE_ANON_KEY,
-            "Authorization":"Bearer "+token,
-            "Prefer":"resolution=merge-duplicates,return=minimal"
-          },
-          body:JSON.stringify({id:"public",payload:payload,updated_at:payload.updatedAt})
-        });
-        if(!response.ok){
-          var errorText=await response.text();
-          throw new Error("雲端寫入失敗（"+response.status+"）："+errorText.slice(0,350));
-        }
-        setCloudStatus("雲端同步成功 · "+customerRows.length+" 筆歷史方案",false);
-        return true;
-      }catch(error){
-        setCloudStatus(error.message||"雲端同步失敗",true);
-        console.error("Supabase sync error:",error);
-        return false;
-      }
+      try{localStorage.setItem("beautyCustomerData",JSON.stringify(payload));}
+      catch(error){alert("無法儲存顧客方案資料，請確認瀏覽器允許網站儲存資料。");return;}
+      return true;
     }
-
+    function openCustomerPage(){
+      if(!syncCustomerData())return;
+      var customerUrl=new URL("customer.html",window.location.href);
+      customerUrl.searchParams.set("sync",Date.now().toString());
+      window.location.assign(customerUrl.href);
+    }
     data.pricingProducts.forEach(function(p){
       p.plans=p.plans||{};
       ["basic","advanced","premium"].forEach(function(k){
@@ -1077,7 +1013,6 @@ input[type=number]{text-align:right}
       data.prices = [];
       save();
       drawHistory();
-      syncCustomerData();
     };
 
     /* 匯出 */
@@ -1202,8 +1137,7 @@ function exportHistoryPdf() {
 }
 
 $("exportAll").onclick = exportAllPdf;
-    $("cloudSyncButton").onclick = function () { syncCustomerData(); };
-    $("exportCustomer").onclick = function () { window.open(new URL("customer.html",window.location.href).href,"_blank"); };
+    $("exportCustomer").onclick = function () { openCustomerPage(); };
     renderPricingProducts();
 
 $("exportHistory").onclick = exportHistoryPdf;
