@@ -694,20 +694,15 @@ input[type=number]{text-align:right}
     }
 
     function openCustomerPage(){
-      if(!data.lastResult){
-        alert("請先在「套組成本分析」按「開始計算並儲存」，再開啟顧客套組。");
-        return;
-      }
-      // 優先使用目前頁面中的結果；若重新載入後尚未還原，則取最近一筆已儲存計算紀錄。
-      var latestResult=data.lastResult;
-      if(!latestResult && data.prices.length && data.prices[0].result){
-        latestResult=data.prices[0].result;
-        data.lastResult=latestResult;
-      }
+      // prices 使用 unshift 新增紀錄，因此第 0 筆是最近一次「已儲存」計算。
+      // 優先採用這筆資料，避免檢視歷史方案後把舊結果送到顧客端。
+      var latestResult = data.prices.length && data.prices[0].result
+        ? data.prices[0].result : data.lastResult;
       if(!latestResult || !Array.isArray(latestResult.rows) || latestResult.rows.length<3){
-        alert("找不到完整的三組套組計算結果，請先重新計算並儲存。");
+        alert("請先在「套組成本分析」按「開始計算並儲存」，確認三組價格已完成計算。");
         return;
       }
+      data.lastResult=latestResult;
       var rows=latestResult.rows;
       var planKeys=["basic","advanced","premium"];
       var customerRows=[0,1,2].map(function(t){
@@ -728,7 +723,9 @@ input[type=number]{text-align:right}
       }
       // 在同一個分頁轉跳至顧客端，不另開新視窗。
       // 先完成 localStorage 寫入，再導向顧客頁面，顧客端即可讀取最新計算結果。
-      window.location.href = new URL("customer.html", window.location.href).href;
+      var customerUrl = new URL("customer.html", window.location.href);
+      customerUrl.searchParams.set("sync", Date.now().toString());
+      window.location.assign(customerUrl.href);
     }
     var pricingCategories=["清潔","化妝水","去角質","精華","面膜","滋養","隔離"];
     var planKeys=["basic","advanced","premium"];
@@ -954,7 +951,10 @@ input[type=number]{text-align:right}
       var fragment=document.createDocumentFragment();
       while(main.firstChild)fragment.append(main.firstChild);
       var oldText=metrics.textContent;
+      // 歷史紀錄只供檢視，不得覆蓋目前最新計算結果。
+      var latestResult=data.lastResult;
       drawResults(item.inputs,item.result);
+      data.lastResult=latestResult;
       while(main.firstChild)panel.append(main.firstChild);
       main.append(fragment);metrics.textContent=oldText;
     }
