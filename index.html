@@ -96,7 +96,7 @@ input[type=number]{text-align:right}
 </section>
 <p class="note footer" id="storageStatus"></p>
 </div>
-<dialog id="cloudLoginDialog" style="border:1px solid #dfe6da;border-radius:16px;padding:22px;max-width: min(92vw,420px);width:100%;color:#203b34"><form id="cloudLoginForm"><h2>公司端雲端同步登入</h2><p class="note">請使用已建立的 Supabase 公司端帳號。密碼只用於登入，不會儲存在網站。</p><label for="cloudEmail">登入 Email</label><input id="cloudEmail" type="email" autocomplete="username" required style="margin-bottom:12px"><label for="cloudPassword">登入密碼</label><input id="cloudPassword" type="password" autocomplete="current-password" required style="margin-bottom:16px"><div style="display:flex;gap:8px;justify-content:flex-end"><button type="button" id="cloudLoginCancel">取消</button><button type="submit" class="primary">登入並上傳歷史方案</button></div></form></dialog>
+<dialog id="cloudLoginDialog" style="border:1px solid #dfe6da;border-radius:16px;padding:22px;max-width: min(92vw,420px);width:100%;color:#203b34"><form id="cloudLoginForm"><h2>公司端雲端同步登入</h2><p class="note">請使用已建立的 Supabase 公司端帳號。密碼只用於登入，不會儲存在網站。</p><label for="cloudEmail">登入 Email</label><input id="cloudEmail" type="email" autocomplete="username" required style="margin-bottom:12px"><label for="cloudPassword">登入密碼</label><input id="cloudPassword" type="password" autocomplete="current-password" required style="margin-bottom:16px"><div style="display:flex;gap:8px;justify-content:flex-end"><button type="button" id="cloudLoginCancel">取消</button><button type="submit" class="primary">登入並同步雲端</button></div></form></dialog>
 <script>
 (function () {
   "use strict";
