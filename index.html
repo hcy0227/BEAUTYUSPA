@@ -688,8 +688,8 @@ input[type=number]{text-align:right}
       };
     }
 
-    function openCustomerPage(){
-      // 彙整所有歷史紀錄：只要該筆紀錄有選擇客戶端對應方案，就同步一筆。
+    function syncCustomerData(){
+      // 彙整所有歷史紀錄：只要該筆紀錄有選擇客戶端對應方案，就同步一筆；不切換頁面。
       var planKeys=["basic","advanced","premium"];
       var targetNames=["煥顏基礎方案","緊緻進階方案","奢寵全效方案"];
       var productSource=data.pricingProducts||[];
@@ -734,6 +734,10 @@ input[type=number]{text-align:right}
       var payload={rows:customerRows,updatedAt:new Date().toISOString()};
       try{localStorage.setItem("beautyCustomerData",JSON.stringify(payload));}
       catch(error){alert("無法儲存顧客方案資料，請確認瀏覽器允許網站儲存資料。");return;}
+      return true;
+    }
+    function openCustomerPage(){
+      if(!syncCustomerData())return;
       var customerUrl=new URL("customer.html",window.location.href);
       customerUrl.searchParams.set("sync",Date.now().toString());
       window.location.assign(customerUrl.href);
@@ -891,7 +895,7 @@ input[type=number]{text-align:right}
         sel.onchange=function(){
           data.customerMapping[Number(sel.dataset.index)]=Number(sel.value);
           save();
-          if(Number(sel.value)!==-1)openCustomerPage();
+          syncCustomerData();
         };
       });
 
@@ -971,8 +975,8 @@ input[type=number]{text-align:right}
           save();
           // 選擇「無同步客戶端」時，只保存歷史設定，不更新顧客端。
           if(Number(sel.value)===-1)return;
-          // 重新彙整所有已選擇對應方案的歷史紀錄。
-          openCustomerPage();
+          // 重新彙整所有已選擇對應方案的歷史紀錄；留在公司端，不跳頁。
+          syncCustomerData();
         };
       });
       while(main.firstChild)panel.append(main.firstChild);
