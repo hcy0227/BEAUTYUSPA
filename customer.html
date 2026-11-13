@@ -113,10 +113,6 @@ footer{text-align:center;font-size:12px;color:#b59aa0;margin-top:24px}
 </section>
 </div>
 
-<div class="contact">
-<b>美瑀SPA美學</b>
-歡迎預約諮詢｜由專人為您規劃適合的保養方案
-</div>
 <footer>本頁方案內容與價格以門市最新公告為準。</footer>
 </div>
 
@@ -147,28 +143,29 @@ function savePlan(planId){
 }
 function render(data){
   if(!data||!Array.isArray(data.rows))return;
-  [1,2,3].forEach(function(i){
-    var row=data.rows[i-1]||{};
-    document.getElementById("price"+i).innerHTML="$"+new Intl.NumberFormat("zh-TW").format(Number(row.price)||0)+'<small> / 套</small>';
-    document.getElementById("sessions"+i).textContent=(Number(row.sessions)||0)+" 堂";
-    var plan=document.getElementById("plan"+i);
-    var sourceLabel=plan.querySelector(".source-plan-name");
-    if(!sourceLabel){
-      sourceLabel=document.createElement("p");
-      sourceLabel.className="source-plan-name";
-      sourceLabel.style.cssText="margin:0 0 8px;color:var(--muted);font-size:12px";
-      plan.querySelector(".desc").insertAdjacentElement("afterend",sourceLabel);
-    }
-    sourceLabel.textContent="同步來源："+(row.sourcePlanName||"公司端對應套組");
-    var ul=document.getElementById("list"+i);
+  var grid=document.querySelector(".grid");
+  grid.innerHTML="";
+  var names=["煥顏基礎方案","緊緻進階方案","奢寵全效方案"];
+  var tags=["基礎保養","熱銷推薦","完整方案"];
+  data.rows.forEach(function(row,index){
+    var planName=row.planName||names[Number(row.targetIndex)]||"顧客套組方案";
+    var tag=tags[Number(row.targetIndex)]||"專屬方案";
     var products=Array.isArray(row.products)?row.products:[];
-    ul.innerHTML=products.length?products.map(function(p){
-      var ml=p.ml? ("・"+escapeHtml(p.ml)+" ml"):"";
-      var quantity=Number(p.quantity)>0?(" *"+Number(p.quantity)):"";
+    var productList=products.length?products.map(function(p){
+      var ml=p.ml?("・"+escapeHtml(p.ml)+" ml"):"";
+      var quantity=Number(p.quantity)>0?(" × "+Number(p.quantity)):"";
       return "<li>"+escapeHtml(p.name||"未命名產品")+ml+quantity+"</li>";
     }).join(""):"<li>尚未選擇產品</li>";
+    var card=document.createElement("section");
+    card.className="plan";
+    card.innerHTML='<span class="tag">'+escapeHtml(tag)+'</span>'+      '<h2>'+escapeHtml(planName)+'</h2>'+      '<p class="desc">適合依照個人需求規劃的專屬保養方案</p>'+      '<p style="margin:0 0 8px;color:var(--muted);font-size:12px">同步來源：'+escapeHtml(row.sourcePlanName||"公司端方案")+'</p>'+      '<p style="margin:0 0 8px;color:var(--muted);font-size:12px">歷史紀錄：'+escapeHtml(row.historyTime?new Date(row.historyTime).toLocaleString("zh-TW"):"未提供")+'</p>'+      '<div class="price">$'+new Intl.NumberFormat("zh-TW").format(Number(row.price)||0)+'<small> / 套</small></div>'+      '<div class="line"><span>服務堂數</span><b>'+((Number(row.sessions)||0)+" 堂")+'</b></div>'+      '<div class="line"><span>產品配貨</span><b><button class="link" type="button">點擊查看產品</button></b></div>'+      '<div class="detail" hidden><ul>'+productList+'</ul></div>'+      '<div class="line"><span>居家保養指導</span><b>包含</b></div>'+      '<ul class="includes"><li>專屬保養規劃</li><li>產品使用教學</li></ul>';
+    var button=card.querySelector("button.link");
+    button.addEventListener("click",function(){var detail=card.querySelector(".detail");detail.hidden=!detail.hidden;});
+    grid.appendChild(card);
   });
+  if(!data.rows.length)grid.textContent="目前尚無已同步的歷史方案。";
 }
+
 function escapeHtml(value){
   return String(value).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
 }
