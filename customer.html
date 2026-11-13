@@ -134,7 +134,7 @@ function render(data){
   var grid=document.querySelector(".grid");if(!grid||!data||!Array.isArray(data.rows))return;
   grid.innerHTML="";
   var names=["煥顏基礎方案","緊緻進階方案","奢寵全效方案"],tags=["基礎保養","熱銷推薦","完整方案"];
-  data.rows.slice().sort(function(a,b){return Number(a.targetIndex)-Number(b.targetIndex);}).forEach(function(row){
+  data.rows.slice().sort(function(a,b){return Number(a.targetIndex)-Number(b.targetIndex);}).forEach(function(row,rowIndex){
     var target=Number(row.targetIndex),planName=row.planName||names[target]||"顧客套組方案";
     var products=Array.isArray(row.products)?row.products:[];
     var productList=products.length?products.map(function(p){
@@ -142,7 +142,7 @@ function render(data){
       return "<li>"+escapeHtml(p.name||"未命名產品")+ml+quantity+"</li>";
     }).join(""):"<li>尚未選擇產品</li>";
     var homeCareItems=[["專屬保養規劃","產品使用教學"],["專屬保養規劃","產品使用教學","進度追蹤"],["專屬保養規劃","產品使用教學","進度追蹤","優先預約"]][target]||["專屬保養規劃","產品使用教學"];
-    var card=document.createElement("section");card.className="plan";
+    var card=document.createElement("section");card.className="plan";card.id="customerPlan"+rowIndex;
     card.innerHTML=
       '<span class="tag">'+escapeHtml(tags[target]||"專屬方案")+'</span>'+
       '<h2>'+escapeHtml(planName)+'</h2>'+
@@ -152,9 +152,11 @@ function render(data){
       '<div class="line"><span>產品配貨</span><b><button class="link" type="button">點擊查看產品</button></b></div>'+
       '<div class="detail" hidden><ul>'+productList+'</ul></div>'+
       '<div class="line"><span>居家保養指導</span><b>包含</b></div>'+
-      '<ul class="includes">'+homeCareItems.map(function(item){return "<li>"+escapeHtml(item)+"</li>";}).join("")+'</ul>';
+      '<ul class="includes">'+homeCareItems.map(function(item){return "<li>"+escapeHtml(item)+"</li>";}).join("")+'</ul>'+
+      '<div class="cta"><button class="btn export-plan" type="button">匯出方案</button></div>';
     var button=card.querySelector("button.link");
     button.addEventListener("click",function(){var detail=card.querySelector(".detail");detail.hidden=!detail.hidden;});
+    card.querySelector(".export-plan").addEventListener("click",function(){savePlan(card.id);});
     grid.appendChild(card);
   });
   if(!data.rows.length)grid.textContent="目前尚無已同步的歷史方案。";
