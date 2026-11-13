@@ -198,7 +198,7 @@ function fromParams(){
       var rows=await response.json();
       if(!Array.isArray(rows)||!rows.length){
         render({rows:[]});
-        if(grid)grid.innerHTML="<p class=\\\"empty\\\">雲端目前沒有歷史方案資料。請先在公司端登入 Supabase，按下「登入並同步雲端」上傳既有歷史紀錄；若尚未建立資料表，請先執行 supabase_setup.sql。</p>";
+        if(grid)grid.textContent="雲端目前沒有歷史方案資料。請先在公司端登入 Supabase，按下「登入並同步雲端」上傳既有歷史紀錄；若尚未建立資料表，請先執行 supabase_setup.sql。";
         return;
       }
       var payload=rows[0].payload;
