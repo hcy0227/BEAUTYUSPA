@@ -718,19 +718,8 @@ input[type=number]{text-align:right}
           });
         });
       });
-      // 尚無歷史紀錄時，允許同步目前已計算的方案。
-      if(!customerRows.length && data.lastResult && Array.isArray(data.lastResult.rows)){
-        (data.customerMapping||[-1,-1,-1]).forEach(function(targetIndex,sourceIndex){
-          if(targetIndex<0 || targetIndex>2)return;
-          var row=data.lastResult.rows[sourceIndex]||{};
-          var key=planKeys[sourceIndex];
-          customerRows.push({targetIndex:targetIndex,planName:targetNames[targetIndex],price:Number(row.price)||0,sessions:Number(row.sessions)||0,sourcePlanName:String(row.name||("公司端第"+(sourceIndex+1)+"組")),historyTime:"目前方案",products:productSource.filter(function(p){return p.plans&&Number(p.plans[key])>0;}).map(function(p){return {name:String(p.name||"未命名產品"),ml:String(p.ml||""),quantity:Number(p.plans[key])||0};})});
-        });
-      }
-      if(!customerRows.length){
-        alert("目前沒有已選擇客戶端對應方案的歷史紀錄，請先在任一筆歷史方案中選擇要同步的客戶端方案。");
-        return;
-      }
+      // 不以目前計算結果覆蓋歷史同步；所有歷史都依各自 mapping 決定是否出現在客戶端。
+      // 即使 customerRows 為空也寫入空資料，讓客戶端能即時清除已取消的同步方案。
       var payload={rows:customerRows,updatedAt:new Date().toISOString()};
       try{localStorage.setItem("beautyCustomerData",JSON.stringify(payload));}
       catch(error){alert("無法儲存顧客方案資料，請確認瀏覽器允許網站儲存資料。");return;}
@@ -973,9 +962,7 @@ input[type=number]{text-align:right}
           if(!Array.isArray(item.customerMapping))item.customerMapping=[-1,-1,-1];
           item.customerMapping[Number(sel.dataset.index)]=Number(sel.value);
           save();
-          // 選擇「無同步客戶端」時，只保存歷史設定，不更新顧客端。
-          if(Number(sel.value)===-1)return;
-          // 重新彙整所有已選擇對應方案的歷史紀錄；留在公司端，不跳頁。
+          // 無論選擇哪個對應方案或取消同步，都立即重整客戶端資料；留在公司端，不跳頁。
           syncCustomerData();
         };
       });
