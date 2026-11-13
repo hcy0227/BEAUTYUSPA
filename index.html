@@ -700,7 +700,6 @@ input[type=number]{text-align:right}
         alert("請先在「套組成本分析」按「開始計算並儲存」，確認三組價格已完成計算。");
         return;
       }
-      data.lastResult=latestResult;
       var rows=latestResult.rows;
       var planKeys=["basic","advanced","premium"];
       var customerRows=[0,1,2].map(function(t){
@@ -959,6 +958,9 @@ input[type=number]{text-align:right}
           if(!Array.isArray(item.customerMapping))item.customerMapping=[-1,-1,-1];
           item.customerMapping[Number(sel.dataset.index)]=Number(sel.value);
           save();
+          // 選擇「無同步客戶端」時，只保存歷史設定，不更新顧客端。
+          if(Number(sel.value)===-1)return;
+          // 使用目前選取的歷史定價結果，不改讀最新計算結果。
           openCustomerPage(item.result, data.pricingProducts, item.customerMapping);
         };
       });
