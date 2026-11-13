@@ -193,6 +193,20 @@ function fromParams(){
   }catch(e){}
   if(!data)data=fromParams();
   render(data);
+  // 公司端在另一個分頁修改歷史方案對應時，客戶端分頁同步更新，不必重新整理。
+  window.addEventListener("storage",function(event){
+    if(event.key!=="beautyCustomerData")return;
+    var updated=null;
+    try{
+      if(event.newValue){
+        var parsed=JSON.parse(event.newValue);
+        if(parsed && Array.isArray(parsed.rows))updated=parsed;
+      }else{
+        updated={rows:[]};
+      }
+    }catch(e){updated={rows:[]};}
+    render(updated);
+  });
 })();
 (function(){
   var btn=document.getElementById("backToCompany");
