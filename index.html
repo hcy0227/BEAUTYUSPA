@@ -70,7 +70,7 @@ input[type=number]{text-align:right}
 <body>
 <div class="app">
 <header class="top"><div><div class="brand">BEAUTY．U．SPA COMPANY</div><h1>美瑀SPA美學｜產品配貨分析</h1><small>產品配貨 · 套組方案 · 雙計算機</small></div><button id="exportAll">匯出全部資料備份</button>
-<button id="cloudSyncButton">登入並同步雲端</button><small id="cloudSyncStatus" role="status">雲端尚未同步</small></header>
+<button id="exportCustomer">匯出顧客套組</button><button id="cloudSyncButton">登入並同步雲端</button><small id="cloudSyncStatus" role="status">雲端尚未同步</small></header>
 <nav class="nav"><button class="active" data-page="pricing">套組成本分析</button><button data-page="calculators">一般計算機 A／B</button>
 <button data-page="productPricing">產品定價</button></nav>
 <section class="page active" id="pricing">
@@ -1203,6 +1203,7 @@ function exportHistoryPdf() {
 
 $("exportAll").onclick = exportAllPdf;
     $("cloudSyncButton").onclick = function () { syncCustomerData(); };
+    $("exportCustomer").onclick = function () { window.open(new URL("customer.html",window.location.href).href,"_blank"); };
     renderPricingProducts();
 
 $("exportHistory").onclick = exportHistoryPdf;
