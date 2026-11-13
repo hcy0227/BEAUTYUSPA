@@ -151,6 +151,15 @@ function render(data){
     var row=data.rows[i-1]||{};
     document.getElementById("price"+i).innerHTML="$"+new Intl.NumberFormat("zh-TW").format(Number(row.price)||0)+'<small> / 套</small>';
     document.getElementById("sessions"+i).textContent=(Number(row.sessions)||0)+" 堂";
+    var plan=document.getElementById("plan"+i);
+    var sourceLabel=plan.querySelector(".source-plan-name");
+    if(!sourceLabel){
+      sourceLabel=document.createElement("p");
+      sourceLabel.className="source-plan-name";
+      sourceLabel.style.cssText="margin:0 0 8px;color:var(--muted);font-size:12px";
+      plan.querySelector(".desc").insertAdjacentElement("afterend",sourceLabel);
+    }
+    sourceLabel.textContent="同步來源："+(row.sourcePlanName||"公司端對應套組");
     var ul=document.getElementById("list"+i);
     var products=Array.isArray(row.products)?row.products:[];
     ul.innerHTML=products.length?products.map(function(p){
