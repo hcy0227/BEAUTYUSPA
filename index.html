@@ -129,7 +129,12 @@ input[type=number]{text-align:right}
     function getCloudSession(){try{return JSON.parse(localStorage.getItem(cloudSessionKey)||"null");}catch(e){return null;}}
     async function pushCustomerPayload(payload){
       var session=getCloudSession();
-      if(!session||!session.access_token){$("storageStatus").textContent="本機資料已更新；請按「登入並同步雲端」完成雲端上傳。";return false;}
+      if(!session||!session.access_token){
+        $("storageStatus").textContent="資料已在本機保存；請先登入雲端，再同步歷史方案。";
+        return false;
+      }
+      $("storageStatus").className="note footer";
+      $("storageStatus").textContent="正在同步客戶端方案…";
       try{
         var response=await fetch(SUPABASE_URL+"/rest/v1/"+SUPABASE_TABLE,{
           method:"POST",
@@ -137,9 +142,14 @@ input[type=number]{text-align:right}
           body:JSON.stringify({id:"public",payload:payload,updated_at:new Date().toISOString()})
         });
         if(!response.ok){var detail=await response.text();throw new Error("Supabase "+response.status+": "+detail.slice(0,500));}
-        $("storageStatus").textContent="雲端同步成功｜"+new Date().toLocaleString("zh-TW");
+        $("storageStatus").className="note footer";
+        $("storageStatus").textContent="雲端同步成功｜"+new Date().toLocaleString("zh-TW")+"｜已同步 "+payload.rows.length+" 筆歷史方案";
         return true;
-      }catch(error){$("storageStatus").textContent="雲端同步失敗："+error.message+"。請重新登入或檢查 Supabase 權限。";return false;}
+      }catch(error){
+        $("storageStatus").className="note footer error";
+        $("storageStatus").textContent="雲端同步失敗："+error.message+"。請重新登入或檢查 Supabase 權限。";
+        return false;
+      }
     }
 
     var data = {
@@ -743,8 +753,7 @@ input[type=number]{text-align:right}
       var payload={rows:customerRows,updatedAt:new Date().toISOString()};
       try{localStorage.setItem("beautyCustomerData",JSON.stringify(payload));}
       catch(error){alert("無法儲存顧客方案資料，請確認瀏覽器允許網站儲存資料。");return;}
-      pushCustomerPayload(payload);
-      return true;
+      return pushCustomerPayload(payload);
     }
     function openCustomerPage(){
       if(!syncCustomerData())return;
@@ -982,16 +991,15 @@ input[type=number]{text-align:right}
       item.customerMapping=data.customerMapping.slice();
       data.customerMapping=currentMapping;
       data.lastResult=latestResult;
+      while(main.firstChild)panel.append(main.firstChild);
       panel.querySelectorAll(".map-select").forEach(function(sel){
         sel.onchange=function(){
           if(!Array.isArray(item.customerMapping))item.customerMapping=[-1,-1,-1];
           item.customerMapping[Number(sel.dataset.index)]=Number(sel.value);
           save();
-          // 無論選擇哪個對應方案或取消同步，都立即重整客戶端資料；留在公司端，不跳頁。
           syncCustomerData();
         };
       });
-      while(main.firstChild)panel.append(main.firstChild);
       main.append(fragment);metrics.textContent=oldText;
     }
     $("calculatePrice").onclick = function () {
@@ -1174,11 +1182,12 @@ $("exportAll").onclick = exportAllPdf;
         var loginData=await loginResponse.json();
         if(!loginResponse.ok)throw new Error(loginData.msg||loginData.message||loginData.error_description||loginData.error||"登入失敗（HTTP "+loginResponse.status+"）");
         localStorage.setItem(cloudSessionKey,JSON.stringify({access_token:loginData.access_token,refresh_token:loginData.refresh_token,expires_at:Date.now()+Number(loginData.expires_in||3600)*1000}));
-        $("cloudPassword").value="";cloudDialog.close();
-        $("storageStatus").textContent="登入成功，正在上傳所有歷史方案…";
-        syncCustomerData();
+        $("cloudPassword").value="";
+        $("storageStatus").textContent="登入成功，正在同步所有已選擇的歷史方案…";
+        var synced=await syncCustomerData();
+        if(synced)cloudDialog.close();
       }catch(error){$("storageStatus").textContent="登入／同步失敗："+error.message;}
-      finally{button.disabled=false;button.textContent="登入並上傳歷史方案";}
+      finally{button.disabled=false;button.textContent="登入並同步雲端";}
     };
     renderPricingProducts();
 
