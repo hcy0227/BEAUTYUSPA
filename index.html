@@ -90,7 +90,7 @@ input[type=number]{text-align:right}
 <section class="page" id="calculators"><div class="calcs" id="calcs"></div><p class="note">兩台計算機獨立運算及保存歷史。採逐步運算，例如 2＋3×4＝20；% 表示目前數字除以100，例如 200×10%＝20。計算完成按＝才記錄。</p></section>
 <section class="page" id="productPricing">
 <div class="card">
-<p class="note">各套組數量填入數字；0 代表不配貨。顧客端顯示格式為 *數字。</p><p class="note">各套組數量填入數字；0 代表不配貨。顧客端顯示格式為 *數字。</p><div id="pricingList"></div>
+<p class="note">各套組數量填入數字；0 代表不配貨。顧客端顯示格式為 *數字。</p><div id="pricingList"></div>
 <p class="note" id="pricingStatus"></p>
 </div>
 </section>
@@ -688,11 +688,10 @@ input[type=number]{text-align:right}
       };
     }
 
-    function openCustomerPage(){
-      // prices 使用 unshift 新增紀錄，因此第 0 筆是最近一次「已儲存」計算。
-      // 優先採用這筆資料，避免檢視歷史方案後把舊結果送到顧客端。
-      var latestResult = data.prices.length && data.prices[0].result
-        ? data.prices[0].result : data.lastResult;
+    function openCustomerPage(selectedResult){
+      // 未指定歷史紀錄時，使用最新一次已儲存的計算結果。
+      var latestResult = selectedResult || (data.prices.length && data.prices[0].result
+        ? data.prices[0].result : data.lastResult);
       if(!latestResult || !Array.isArray(latestResult.rows) || latestResult.rows.length<3){
         alert("請先在「套組成本分析」按「開始計算並儲存」，確認三組價格已完成計算。");
         return;
@@ -905,7 +904,8 @@ input[type=number]{text-align:right}
       });
       $("plans").querySelectorAll(".plan").forEach(function (card) {
         card.onclick = function (event) {
-          if (event.target.closest("details")) return;
+          // 操作套組同步選單或其他互動元件時，不要誤觸發下方細項展開。
+          if (event.target.closest("details, select, input, button, textarea, label, summary")) return;
           if (window.getSelection().toString()) return;
 
           var details = card.querySelector("details");
@@ -931,6 +931,7 @@ input[type=number]{text-align:right}
         toggle.onclick=function(){panel.hidden=!panel.hidden;toggle.textContent=panel.hidden?"查看本次方案":"收合本次方案";toggle.setAttribute("aria-expanded",String(!panel.hidden));};
         entry.append(header,p,toggle,panel);box.append(entry);
         renderHistorical(item,panel);
+
       });
     }
     function renderHistorical(item,panel){
@@ -942,6 +943,13 @@ input[type=number]{text-align:right}
       var latestResult=data.lastResult;
       drawResults(item.inputs,item.result);
       data.lastResult=latestResult;
+      panel.querySelectorAll(".map-select").forEach(function(sel){
+        sel.onchange=function(){
+          data.customerMapping[Number(sel.dataset.index)]=Number(sel.value);
+          save();
+          openCustomerPage(item.result);
+        };
+      });
       while(main.firstChild)panel.append(main.firstChild);
       main.append(fragment);metrics.textContent=oldText;
     }
@@ -954,6 +962,8 @@ input[type=number]{text-align:right}
         var settings = readSettings();
         var result = compute(settings);
 
+        // 每次新計算的三個套組，預設皆不同步至顧客端。
+        data.customerMapping = [-1, -1, -1];
         drawResults(settings, result);
 
         data.prices.unshift({
