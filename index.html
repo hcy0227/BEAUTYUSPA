@@ -883,6 +883,10 @@ input[type=number]{text-align:right}
       $("plans").querySelectorAll(".map-select").forEach(function(sel){
         sel.onchange=function(){
           data.customerMapping[Number(sel.dataset.index)]=Number(sel.value);
+          // 目前畫面上的計算結果也必須寫回對應的歷史紀錄；
+          // 否則同步程序只讀歷史資料時，最新一筆永遠會是「未同步」。
+          var currentHistory=data.prices.find(function(item){return item && item.result===data.lastResult;});
+          if(currentHistory)currentHistory.customerMapping=data.customerMapping.slice();
           save();
           syncCustomerData();
         };
@@ -932,7 +936,7 @@ input[type=number]{text-align:right}
         var header=document.createElement("div");header.className="row-head";
         var time=document.createElement("strong");time.textContent=new Date(item.time).toLocaleString("zh-TW");
         var remove=document.createElement("button");remove.className="danger";remove.textContent="刪除";
-        remove.onclick=function(){if(!confirm("刪除此筆定價歷史？"))return;data.prices=data.prices.filter(function(x){return x.id!==item.id});save();drawHistory();};
+        remove.onclick=function(){if(!confirm("刪除此筆定價歷史？"))return;data.prices=data.prices.filter(function(x){return x.id!==item.id});save();syncCustomerData();drawHistory();};
         header.append(time,remove);
         var p=document.createElement("p");p.textContent=item.result.rows.map(function(x){return x.name+" "+money(x.price)}).join(" ／ ");
         var toggle=document.createElement("button");toggle.textContent="查看本次方案";toggle.setAttribute("aria-expanded","false");
