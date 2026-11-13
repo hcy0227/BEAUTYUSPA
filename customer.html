@@ -125,8 +125,9 @@ function render(data){
     var ul=document.getElementById("list"+i);
     var products=Array.isArray(row.products)?row.products:[];
     ul.innerHTML=products.length?products.map(function(p){
-      var ml=p.ml? ("・"+escapeHtml(p.ml)):"";
-      return "<li>"+escapeHtml(p.name||"未命名產品")+ml+"</li>";
+      var ml=p.ml? ("・"+escapeHtml(p.ml)+" ml"):"";
+      var quantity=Number(p.quantity)>0?(" *"+Number(p.quantity)):"";
+      return "<li>"+escapeHtml(p.name||"未命名產品")+ml+quantity+"</li>";
     }).join(""):"<li>尚未選擇產品</li>";
   });
 }
