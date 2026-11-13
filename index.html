@@ -1168,7 +1168,16 @@ function exportHistoryPdf() {
 $("exportAll").onclick = exportAllPdf;
     $("exportCustomer").onclick = function () { openCustomerPage(); };
     var cloudDialog=$("cloudLoginDialog");
-    $("cloudSync").onclick=function(){cloudDialog.showModal();};
+    $("cloudSync").onclick=function(){
+      if(getCloudSession()&&getCloudSession().access_token){
+        $("cloudSync").textContent="同步雲端中…";
+        $("cloudSync").disabled=true;
+        syncCustomerData().then(function(ok){
+          $("cloudSync").textContent=ok?"雲端同步完成":"重新同步雲端";
+          $("cloudSync").disabled=false;
+        });
+      }else{cloudDialog.showModal();}
+    };
     $("cloudLoginCancel").onclick=function(){cloudDialog.close();};
     $("cloudLoginForm").onsubmit=async function(event){
       event.preventDefault();
@@ -1183,11 +1192,23 @@ $("exportAll").onclick = exportAllPdf;
         if(!loginResponse.ok)throw new Error(loginData.msg||loginData.message||loginData.error_description||loginData.error||"登入失敗（HTTP "+loginResponse.status+"）");
         localStorage.setItem(cloudSessionKey,JSON.stringify({access_token:loginData.access_token,refresh_token:loginData.refresh_token,expires_at:Date.now()+Number(loginData.expires_in||3600)*1000}));
         $("cloudPassword").value="";
+        $("cloudSync").textContent="同步雲端中…";
+        $("cloudSync").disabled=true;
         $("storageStatus").textContent="登入成功，正在同步所有已選擇的歷史方案…";
         var synced=await syncCustomerData();
-        if(synced)cloudDialog.close();
-      }catch(error){$("storageStatus").textContent="登入／同步失敗："+error.message;}
-      finally{button.disabled=false;button.textContent="登入並同步雲端";}
+        if(synced){
+          $("cloudSync").textContent="雲端同步完成";
+          cloudDialog.close();
+        }else{
+          $("cloudSync").textContent="重新同步雲端";
+        }
+      }catch(error){
+        $("cloudSync").textContent="重新登入雲端";
+        $("storageStatus").textContent="登入／同步失敗："+error.message;
+      }finally{
+        $("cloudSync").disabled=false;
+        button.disabled=false;button.textContent="登入並同步雲端";
+      }
     };
     renderPricingProducts();
 
