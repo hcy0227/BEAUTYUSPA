@@ -146,13 +146,16 @@ function fromParams(){
   return {rows:rows};
 }
 (function(){
-  var data=fromParams();
-  if(!data){
-    try{
-      var raw=localStorage.getItem("beautyCustomerData");
-      if(raw)data=JSON.parse(raw);
-    }catch(e){}
-  }
+  // 優先讀取公司端最新寫入的資料；網址參數僅作為舊版相容備援。
+  var data=null;
+  try{
+    var raw=localStorage.getItem("beautyCustomerData");
+    if(raw){
+      var stored=JSON.parse(raw);
+      if(stored && Array.isArray(stored.rows))data=stored;
+    }
+  }catch(e){}
+  if(!data)data=fromParams();
   render(data);
 })();
 (function(){
