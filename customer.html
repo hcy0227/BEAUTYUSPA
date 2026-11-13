@@ -194,18 +194,21 @@ function fromParams(){
   if(!data)data=fromParams();
   render(data);
   // 公司端在另一個分頁修改歷史方案對應時，客戶端分頁同步更新，不必重新整理。
-  window.addEventListener("storage",function(event){
-    if(event.key!=="beautyCustomerData")return;
-    var updated=null;
+  function refreshCustomerData(){
     try{
-      if(event.newValue){
-        var parsed=JSON.parse(event.newValue);
-        if(parsed && Array.isArray(parsed.rows))updated=parsed;
-      }else{
-        updated={rows:[]};
-      }
-    }catch(e){updated={rows:[]};}
-    render(updated);
+      var raw=localStorage.getItem("beautyCustomerData");
+      if(!raw){render({rows:[]});return;}
+      var parsed=JSON.parse(raw);
+      if(parsed && Array.isArray(parsed.rows))render(parsed);
+    }catch(e){render({rows:[]});}
+  }
+  // 跨分頁即時接收公司端更新；切回客戶端時再讀一次，避免漏接事件。
+  window.addEventListener("storage",function(event){
+    if(event.key==="beautyCustomerData")refreshCustomerData();
+  });
+  window.addEventListener("focus",refreshCustomerData);
+  document.addEventListener("visibilitychange",function(){
+    if(!document.hidden)refreshCustomerData();
   });
 })();
 (function(){
