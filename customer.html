@@ -158,7 +158,102 @@ function render(data){
     }).join(""):"<li>尚未選擇產品</li>";
     var card=document.createElement("section");
     card.className="plan";
-    card.innerHTML='<span class="tag">'+escapeHtml(tag)+'</span>'+      '<h2>'+escapeHtml(planName)+'</h2>'+      '<p class="desc">適合依照個人需求規劃的專屬保養方案</p>'+      '<p style="margin:0 0 8px;color:var(--muted);font-size:12px">同步來源：'+escapeHtml(row.sourcePlanName||"公司端方案")+'</p>'+      '<p style="margin:0 0 8px;color:var(--muted);font-size:12px">歷史紀錄：'+escapeHtml(row.historyTime?new Date(row.historyTime).toLocaleString("zh-TW"):"未提供")+'</p>'+      '<div class="price">$'+new Intl.NumberFormat("zh-TW").format(Number(row.price)||0)+'<small> / 套</small></div>'+      '<div class="line"><span>服務堂數</span><b>'+((Number(row.sessions)||0)+" 堂")+'</b></div>'+      '<div class="line"><span>產品配貨</span><b><button class="link" type="button">點擊查看產品</button></b></div>'+      '<div class="detail" hidden><ul>'+productList+'</ul></div>'+      '<div class="line"><span>居家保養指導</span><b>包含</b></div>'+      '<ul class="includes"><li>專屬保養規劃</li><li>產品使用教學</li></ul>';
+    var homeCareItems=[
+      ["專屬保養規劃","產品使用教學"],
+      ["專屬保養規劃","產品使用教學","進度追蹤"],
+      ["專屬保養規劃","產品使用教學","進度追蹤","優先預約"]
+    ][Number(row.targetIndex)]||["專屬保養規劃","產品使用教學"];
+    var homeCareList=homeCareItems.map(function(item){return "<li>"+escapeHtml(item)+"</li>";}).join("");
+    card.innerHTML='<span class="tag">'+escapeHtml(tag)+'</span>'+
+      '<h2>'+escapeHtml(planName)+'</h2>'+
+      '<p class="desc">適合依照個人需求規劃的專屬保養方案</p>'+
+      '<p style="margin:0 0 8px;color:var(--muted);font-size:12px">同步來源：'+escapeHtml(row.sourcePlanName||"公司端方案")+'</p>'+
+      '<p style="margin:0 0 8px;color:var(--muted);font-size:12px">歷史紀錄：'+escapeHtml(row.historyTime?new Date(row.historyTime).toLocaleString("zh-TW"):"未提供")+'</p>'+
+      '<div class="price">
+    var button=card.querySelector("button.link");
+    button.addEventListener("click",function(){var detail=card.querySelector(".detail");detail.hidden=!detail.hidden;});
+    grid.appendChild(card);
+  });
+  if(!data.rows.length)grid.textContent="目前尚無已同步的歷史方案。";
+}
+
+function escapeHtml(value){
+  return String(value).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+function fromParams(){
+  var q=new URLSearchParams(location.search);
+  if(!q.get("p1")&&!q.get("p2")&&!q.get("p3"))return null;
+  var rows=[1,2,3].map(function(i){
+    return {price:Number(q.get("p"+i))||0,sessions:Number(q.get("s"+i))||0,products:[]};
+  });
+  try{
+    var products=JSON.parse(q.get("products")||"[]");
+    if(Array.isArray(products))rows.forEach(function(row){row.products=products;});
+  }catch(e){}
+  return {rows:rows};
+}
+(function(){
+  "use strict";
+  var SUPABASE_URL="https://vvsiridpvaovcafmfbvd.supabase.co";
+  var SUPABASE_ANON_KEY="sb_publishable_X1grp4ZPnv4YesF9oYv97Q_JBqBDJAM";
+  var SUPABASE_TABLE="beauty_customer_sync";
+  var grid=document.querySelector(".grid");
+
+  async function loadCustomerData(){
+    try{
+      var response=await fetch(SUPABASE_URL+"/rest/v1/"+SUPABASE_TABLE+"?id=eq.public&select=payload,updated_at",{
+        method:"GET",
+        headers:{"apikey":SUPABASE_ANON_KEY,"Authorization":"Bearer "+SUPABASE_ANON_KEY}
+      });
+      if(!response.ok)throw new Error("雲端資料讀取失敗（"+response.status+"）");
+      var rows=await response.json();
+      if(!Array.isArray(rows)||!rows.length){
+        render({rows:[]});
+        if(grid)grid.textContent="雲端目前沒有歷史方案資料。請先在公司端登入 Supabase，按下「登入並同步雲端」上傳既有歷史紀錄；若尚未建立資料表，請先執行 supabase_setup.sql。";
+        return;
+      }
+      var payload=rows[0].payload;
+      if(!payload||!Array.isArray(payload.rows))throw new Error("雲端資料格式不正確");
+      render(payload);
+      try{localStorage.setItem("beautyCustomerData",JSON.stringify(payload));}catch(e){}
+    }catch(error){
+      console.error("Supabase customer load error:",error);
+      if(grid)grid.textContent="目前無法連線讀取雲端方案，請稍後重新整理。";
+    }
+  }
+
+  loadCustomerData();
+  window.addEventListener("focus",loadCustomerData);
+  document.addEventListener("visibilitychange",function(){if(!document.hidden)loadCustomerData();});
+  // 跨裝置雲端更新：客戶端每 15 秒重新讀取一次。
+  window.setInterval(loadCustomerData,15000);
+})();
+(function(){
+  var btn=document.getElementById("backToCompany");
+  var timer=null;
+  function start(e){
+    e.preventDefault();
+    timer=setTimeout(function(){window.location.href="index.html";},1000);
+  }
+  function cancel(){
+    if(timer){clearTimeout(timer);timer=null;}
+  }
+  btn.addEventListener("mousedown",start);
+  btn.addEventListener("touchstart",start,{passive:false});
+  btn.addEventListener("mouseup",cancel);
+  btn.addEventListener("mouseleave",cancel);
+  btn.addEventListener("touchend",cancel);
+  btn.addEventListener("touchcancel",cancel);
+})();
+</script>
+</body>
+</html>
++new Intl.NumberFormat("zh-TW").format(Number(row.price)||0)+'<small> / 套</small></div>'+
+      '<div class="line"><span>服務堂數</span><b>'+((Number(row.sessions)||0)+" 堂")+'</b></div>'+
+      '<div class="line"><span>產品配貨</span><b><button class="link" type="button">點擊查看產品</button></b></div>'+
+      '<div class="detail" hidden><ul>'+productList+'</ul></div>'+
+      '<div class="line"><span>居家保養指導</span><b>包含</b></div>'+
+      '<ul class="includes">'+homeCareList+'</ul>';
     var button=card.querySelector("button.link");
     button.addEventListener("click",function(){var detail=card.querySelector(".detail");detail.hidden=!detail.hidden;});
     grid.appendChild(card);
