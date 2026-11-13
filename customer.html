@@ -182,34 +182,39 @@ function fromParams(){
   return {rows:rows};
 }
 (function(){
-  // 優先讀取公司端最新寫入的資料；網址參數僅作為舊版相容備援。
-  var data=null;
-  try{
-    var raw=localStorage.getItem("beautyCustomerData");
-    if(raw){
-      var stored=JSON.parse(raw);
-      if(stored && Array.isArray(stored.rows))data=stored;
-    }
-  }catch(e){}
-  if(!data)data=fromParams();
-  render(data);
-  // 公司端在另一個分頁修改歷史方案對應時，客戶端分頁同步更新，不必重新整理。
-  function refreshCustomerData(){
+  "use strict";
+  var SUPABASE_URL="https://vvsiridpvaovcafmfbvd.supabase.co";
+  var SUPABASE_ANON_KEY="sb_publishable_X1grp4ZPnv4YesF9oYv97Q_JBqBDJAM";
+  var SUPABASE_TABLE="beauty_customer_sync";
+  var grid=document.querySelector(".grid");
+
+  async function loadCustomerData(){
     try{
-      var raw=localStorage.getItem("beautyCustomerData");
-      if(!raw){render({rows:[]});return;}
-      var parsed=JSON.parse(raw);
-      if(parsed && Array.isArray(parsed.rows))render(parsed);
-    }catch(e){render({rows:[]});}
+      var response=await fetch(SUPABASE_URL+"/rest/v1/"+SUPABASE_TABLE+"?id=eq.public&select=payload,updated_at",{
+        method:"GET",
+        headers:{"apikey":SUPABASE_ANON_KEY,"Authorization":"Bearer "+SUPABASE_ANON_KEY}
+      });
+      if(!response.ok)throw new Error("雲端資料讀取失敗（"+response.status+"）");
+      var rows=await response.json();
+      if(!Array.isArray(rows)||!rows.length){
+        render({rows:[]});
+        return;
+      }
+      var payload=rows[0].payload;
+      if(!payload||!Array.isArray(payload.rows))throw new Error("雲端資料格式不正確");
+      render(payload);
+      try{localStorage.setItem("beautyCustomerData",JSON.stringify(payload));}catch(e){}
+    }catch(error){
+      console.error("Supabase customer load error:",error);
+      if(grid)grid.textContent="目前無法連線讀取雲端方案，請稍後重新整理。";
+    }
   }
-  // 跨分頁即時接收公司端更新；切回客戶端時再讀一次，避免漏接事件。
-  window.addEventListener("storage",function(event){
-    if(event.key==="beautyCustomerData")refreshCustomerData();
-  });
-  window.addEventListener("focus",refreshCustomerData);
-  document.addEventListener("visibilitychange",function(){
-    if(!document.hidden)refreshCustomerData();
-  });
+
+  loadCustomerData();
+  window.addEventListener("focus",loadCustomerData);
+  document.addEventListener("visibilitychange",function(){if(!document.hidden)loadCustomerData();});
+  // 跨裝置雲端更新：客戶端每 15 秒重新讀取一次。
+  window.setInterval(loadCustomerData,15000);
 })();
 (function(){
   var btn=document.getElementById("backToCompany");
