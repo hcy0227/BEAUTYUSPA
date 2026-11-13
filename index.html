@@ -706,12 +706,20 @@ input[type=number]{text-align:right}
         var sourceIndex=-1;
         mappingSource.forEach(function(v,idx){if(v===t&&sourceIndex<0)sourceIndex=idx;});
         var row=sourceIndex>=0?rows[sourceIndex]:{price:0,sessions:0};
+        // 顧客端第 t 組若對應公司端第 sourceIndex 組，
+        // 產品配貨也必須讀取該公司端組別的 key，而不是顧客端組別的 key。
+        var sourcePlanKey=sourceIndex<0?null:planKeys[sourceIndex];
         var products=sourceIndex<0?[]:productSource.filter(function(p){
-          return p.plans&&Number(p.plans[planKeys[t]])>0;
+          return p.plans&&Number(p.plans[sourcePlanKey])>0;
         }).map(function(p){
-          return {name:String(p.name||"未命名產品"),ml:String(p.ml||""),quantity:Number(p.plans[planKeys[t]])||0};
+          return {name:String(p.name||"未命名產品"),ml:String(p.ml||""),quantity:Number(p.plans[sourcePlanKey])||0};
         });
-        return {price:sourceIndex<0?0:(row.price||0),sessions:sourceIndex<0?0:(row.sessions||0),products:products};
+        return {
+          price:sourceIndex<0?0:(row.price||0),
+          sessions:sourceIndex<0?0:(row.sessions||0),
+          sourcePlanName:sourceIndex<0?"尚未連動":String(row.name||("公司端第"+(sourceIndex+1)+"組")),
+          products:products
+        };
       });
       var payload={rows:customerRows,updatedAt:new Date().toISOString()};
       try{
