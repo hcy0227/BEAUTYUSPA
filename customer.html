@@ -74,7 +74,7 @@ footer{text-align:center;font-size:12px;color:#b59aa0;margin-top:24px}
 <li>專屬保養規劃</li>
 <li>產品使用教學</li>
 </ul>
-<div class="cta"><button class="btn" onclick="savePlan('plan1')">儲存</button></div>
+<div class="cta"><button class="btn" onclick="savePlan('plan1')">匯出方案</button></div>
 </section>
 
 <section class="plan" id="plan2">
@@ -91,7 +91,7 @@ footer{text-align:center;font-size:12px;color:#b59aa0;margin-top:24px}
 <li>產品使用教學</li>
 <li>進度追蹤</li>
 </ul>
-<div class="cta"><button class="btn" onclick="savePlan('plan2')">儲存</button></div>
+<div class="cta"><button class="btn" onclick="savePlan('plan2')">匯出方案</button></div>
 </section>
 
 <section class="plan" id="plan3">
@@ -109,7 +109,7 @@ footer{text-align:center;font-size:12px;color:#b59aa0;margin-top:24px}
 <li>進度追蹤</li>
 <li>優先預約</li>
 </ul>
-<div class="cta"><button class="btn" onclick="savePlan('plan3')">儲存</button></div>
+<div class="cta"><button class="btn" onclick="savePlan('plan3')">匯出方案</button></div>
 </section>
 </div>
 
@@ -134,7 +134,7 @@ function render(data){
   var grid=document.querySelector(".grid");if(!grid||!data||!Array.isArray(data.rows))return;
   grid.innerHTML="";
   var names=["煥顏基礎方案","緊緻進階方案","奢寵全效方案"],tags=["基礎保養","熱銷推薦","完整方案"];
-  data.rows.forEach(function(row){
+  data.rows.slice().sort(function(a,b){return Number(a.targetIndex)-Number(b.targetIndex);}).forEach(function(row){
     var target=Number(row.targetIndex),planName=row.planName||names[target]||"顧客套組方案";
     var products=Array.isArray(row.products)?row.products:[];
     var productList=products.length?products.map(function(p){
@@ -147,8 +147,6 @@ function render(data){
       '<span class="tag">'+escapeHtml(tags[target]||"專屬方案")+'</span>'+
       '<h2>'+escapeHtml(planName)+'</h2>'+
       '<p class="desc">適合依照個人需求規劃的專屬保養方案</p>'+
-      '<p class="source-note">同步來源：'+escapeHtml(row.sourcePlanName||"公司端方案")+'</p>'+
-      '<p class="source-note">歷史紀錄：'+escapeHtml(row.historyTime?new Date(row.historyTime).toLocaleString("zh-TW"):"未提供")+'</p>'+
       '<div class="price">$'+new Intl.NumberFormat("zh-TW").format(Number(row.price)||0)+'<small> / 套</small></div>'+
       '<div class="line"><span>服務堂數</span><b>'+((Number(row.sessions)||0)+" 堂")+'</b></div>'+
       '<div class="line"><span>產品配貨</span><b><button class="link" type="button">點擊查看產品</button></b></div>'+
